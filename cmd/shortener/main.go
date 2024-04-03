@@ -29,9 +29,9 @@ func makeMainHandler() http.HandlerFunc {
 				return
 			}
 
-			_, errUrl := url.ParseRequestURI(string(body))
+			_, errURL := url.ParseRequestURI(string(body))
 
-			if errUrl != nil {
+			if errURL != nil {
 				res.WriteHeader(http.StatusBadRequest)
 				return
 			}
@@ -54,8 +54,8 @@ func makeMainHandler() http.HandlerFunc {
 
 		if req.Method == http.MethodGet {
 			hash := strings.TrimPrefix(req.URL.Path, "/")
-			url, val := urls[hash]
-			if val {
+			url, ok := urls[hash]
+			if ok {
 				http.Redirect(res, req, url, http.StatusTemporaryRedirect)
 			} else {
 				res.WriteHeader(http.StatusBadRequest)
