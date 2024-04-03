@@ -17,7 +17,7 @@ func makeMainHandler() http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
 
 		if req.Method == http.MethodPost {
-			if req.Header.Get("Content-type") != "text/plain" {
+			if req.Header.Get("Content-type") != "text/plain; charset=utf-8" {
 				res.WriteHeader(http.StatusBadRequest)
 				return
 			}
