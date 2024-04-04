@@ -80,7 +80,7 @@ func rootHandler(res http.ResponseWriter, req *http.Request) {
 		getHandler(res, req)
 	default:
 		// В случае метода который не обрабатываем возвращаем ошибку
-		res.WriteHeader(http.StatusBadRequest)
+		http.Error(res, "Метод не доступен", http.StatusBadRequest)
 	}
 }
 
