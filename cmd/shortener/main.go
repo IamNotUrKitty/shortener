@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/binary"
 	"io"
 	"net/http"
 	"net/url"
@@ -10,68 +9,84 @@ import (
 	"github.com/sqids/sqids-go"
 )
 
-func makeMainHandler() http.HandlerFunc {
-	urls := make(map[string]string)
-	s, _ := sqids.New()
+// мапа для хранения значений [хэш]урл
+var urls = make(map[string]string)
 
-	return func(res http.ResponseWriter, req *http.Request) {
+// библиотека для генерации хэшей
+var s, _ = sqids.New()
 
-		if req.Method == http.MethodPost {
-			if req.Header.Get("Content-type") != "text/plain; charset=utf-8" {
-				res.WriteHeader(http.StatusBadRequest)
-				return
-			}
+// Генерация хэша из массива байт
+func makeHash(byteURL []byte) (string, error) {
+	d := make([]uint64, len(byteURL))
 
-			body, errBody := io.ReadAll(req.Body)
+	for i, b := range byteURL {
+		d[i] = uint64(b)
+	}
 
-			if errBody != nil {
-				res.WriteHeader(http.StatusBadRequest)
-				return
-			}
+	hash, err := s.Encode(d)
 
-			_, errURL := url.ParseRequestURI(string(body))
+	return hash[:6], err
+}
 
-			if errURL != nil {
-				res.WriteHeader(http.StatusBadRequest)
-				return
-			}
+// Обработчик POST запросов
+func postHandler(res http.ResponseWriter, req *http.Request) {
+	// Валидация на сontent-type
+	if req.Header.Get("Content-type") != "text/plain; charset=utf-8" {
+		http.Error(res, "Неверный Content-type", http.StatusBadRequest)
+		return
+	}
 
-			defer req.Body.Close()
+	body, errBody := io.ReadAll(req.Body)
 
-			// len < 7 problems
-			data := binary.BigEndian.Uint64(body)
+	if errBody != nil {
+		http.Error(res, errBody.Error(), http.StatusBadRequest)
+		return
+	}
 
-			hash, _ := s.Encode([]uint64{data})
+	// Валидация корректности URL
+	_, errURL := url.ParseRequestURI(string(body))
 
-			urls[hash] = string(body)
+	if errURL != nil {
+		http.Error(res, "Некорректный URL", http.StatusBadRequest)
+		return
+	}
 
-			res.WriteHeader(http.StatusCreated)
+	hash, _ := makeHash(body)
 
-			res.Write([]byte("http://localhost:8080/" + hash))
+	urls[hash] = string(body)
 
-			return
-		}
+	res.WriteHeader(http.StatusCreated)
 
-		if req.Method == http.MethodGet {
-			hash := strings.TrimPrefix(req.URL.Path, "/")
-			url, ok := urls[hash]
-			if ok {
-				http.Redirect(res, req, url, http.StatusTemporaryRedirect)
-			} else {
-				res.WriteHeader(http.StatusBadRequest)
-			}
+	res.Write([]byte("http://localhost:8080/" + hash))
+}
 
-			return
-		}
+// Обработчик GET запросов
+func getHandler(res http.ResponseWriter, req *http.Request) {
+	hash := strings.TrimPrefix(req.URL.Path, "/")
+	url, ok := urls[hash]
+	if ok {
+		http.Redirect(res, req, url, http.StatusTemporaryRedirect)
+	} else {
+		http.Error(res, "URL не найден", http.StatusBadRequest)
+	}
+}
 
+// Обработчик входящего запроса
+func rootHandler(res http.ResponseWriter, req *http.Request) {
+	switch method := req.Method; method {
+	case http.MethodPost:
+		postHandler(res, req)
+	case http.MethodGet:
+		getHandler(res, req)
+	default:
+		// В случае метода который не обрабатываем возвращаем ошибку
 		res.WriteHeader(http.StatusBadRequest)
-
 	}
 }
 
 func main() {
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", makeMainHandler())
+	mux.HandleFunc("/", rootHandler)
 
 	err := http.ListenAndServe(":8080", mux)
 
