@@ -29,7 +29,7 @@ func makeHash(byteURL []byte) (string, error) {
 }
 
 // Обработчик POST запросов
-func postHandler(res http.ResponseWriter, req *http.Request) {
+func PostHandler(res http.ResponseWriter, req *http.Request) {
 	// Валидация на сontent-type
 	if req.Header.Get("Content-type") != "text/plain; charset=utf-8" {
 		http.Error(res, "Неверный Content-type", http.StatusBadRequest)
@@ -61,7 +61,7 @@ func postHandler(res http.ResponseWriter, req *http.Request) {
 }
 
 // Обработчик GET запросов
-func getHandler(res http.ResponseWriter, req *http.Request) {
+func GetHandler(res http.ResponseWriter, req *http.Request) {
 	hash := strings.TrimPrefix(req.URL.Path, "/")
 	url, ok := urls[hash]
 	if ok {
@@ -72,12 +72,12 @@ func getHandler(res http.ResponseWriter, req *http.Request) {
 }
 
 // Обработчик входящего запроса
-func rootHandler(res http.ResponseWriter, req *http.Request) {
+func RootHandler(res http.ResponseWriter, req *http.Request) {
 	switch method := req.Method; method {
 	case http.MethodPost:
-		postHandler(res, req)
+		PostHandler(res, req)
 	case http.MethodGet:
-		getHandler(res, req)
+		GetHandler(res, req)
 	default:
 		// В случае метода который не обрабатываем возвращаем ошибку
 		http.Error(res, "Метод не доступен", http.StatusBadRequest)
@@ -86,7 +86,7 @@ func rootHandler(res http.ResponseWriter, req *http.Request) {
 
 func main() {
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", rootHandler)
+	mux.HandleFunc("/", RootHandler)
 
 	err := http.ListenAndServe(":8080", mux)
 
