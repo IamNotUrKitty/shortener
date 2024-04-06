@@ -4,6 +4,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"github.com/labstack/echo"
 	"github.com/sqids/sqids-go"
@@ -31,7 +32,7 @@ func makeHash(byteURL []byte) (string, error) {
 // Обработчик POST запросов
 func PostHandler(c echo.Context) error {
 	// Валидация на сontent-type
-	if c.Request().Header.Get("Content-type") != "text/plain; charset=UTF-8" {
+	if strings.ToLower(c.Request().Header.Get("Content-type")) != "text/plain; charset=utf-8" {
 		return c.String(http.StatusBadRequest, "Неверный Content-type")
 	}
 
