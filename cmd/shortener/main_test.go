@@ -1,12 +1,12 @@
 package main
 
 import (
-	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 
+	"github.com/labstack/echo"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -32,31 +32,31 @@ func TestPostHandler(t *testing.T) {
 			want: want{
 				code:        http.StatusCreated,
 				response:    "http://localhost:8080/YBrECO",
-				contentType: "",
+				contentType: "text/plain; charset=UTF-8",
 			},
 			payload: payload{
 				body:        "https://ya.ru",
-				contentType: "text/plain; charset=utf-8",
+				contentType: "text/plain; charset=UTF-8",
 			},
 		},
 		{
 			name: "Передана некорректная ссылка для сокращения",
 			want: want{
 				code:        http.StatusBadRequest,
-				contentType: "text/plain; charset=utf-8",
-				response:    "Некорректный URL\n",
+				contentType: "text/plain; charset=UTF-8",
+				response:    "Некорректный URL",
 			},
 			payload: payload{
 				body:        "123",
-				contentType: "text/plain; charset=utf-8",
+				contentType: "text/plain; charset=UTF-8",
 			},
 		},
 		{
 			name: "Передан некорректный Content-type",
 			want: want{
 				code:        http.StatusBadRequest,
-				contentType: "text/plain; charset=utf-8",
-				response:    "Неверный Content-type\n",
+				contentType: "text/plain; charset=UTF-8",
+				response:    "Неверный Content-type",
 			},
 			payload: payload{
 				body:        "https://ya.ru",
@@ -67,15 +67,17 @@ func TestPostHandler(t *testing.T) {
 			name: "Передано пустое тело запроса",
 			want: want{
 				code:        http.StatusBadRequest,
-				contentType: "text/plain; charset=utf-8",
-				response:    "Некорректный URL\n",
+				contentType: "text/plain; charset=UTF-8",
+				response:    "Некорректный URL",
 			},
 			payload: payload{
 				body:        "",
-				contentType: "text/plain; charset=utf-8",
+				contentType: "text/plain; charset=UTF-8",
 			},
 		},
 	}
+
+	e := echo.New()
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
@@ -83,19 +85,16 @@ func TestPostHandler(t *testing.T) {
 			request.Header.Add("Content-type", test.payload.contentType)
 
 			w := httptest.NewRecorder()
-			PostHandler(w, request)
 
-			res := w.Result()
+			c := e.NewContext(request, w)
 
-			defer res.Body.Close()
+			PostHandler(c)
 
-			resBody, _ := io.ReadAll(res.Body)
+			assert.Equal(t, test.want.code, w.Code)
 
-			assert.Equal(t, test.want.code, res.StatusCode)
+			assert.Equal(t, test.want.response, w.Body.String())
 
-			assert.Equal(t, test.want.response, string(resBody))
-
-			assert.Equal(t, test.want.contentType, res.Header.Get("Content-type"))
+			assert.Equal(t, test.want.contentType, w.Header().Get("Content-type"))
 		})
 	}
 }
@@ -118,7 +117,7 @@ func TestGetHandler(t *testing.T) {
 			want: want{
 				code:        http.StatusTemporaryRedirect,
 				response:    "https://ya.ru",
-				contentType: "text/plain; charset=utf-8",
+				contentType: "text/plain; charset=UTF-8",
 			},
 		},
 		{
@@ -126,54 +125,39 @@ func TestGetHandler(t *testing.T) {
 			payload: "123",
 			want: want{
 				code:        http.StatusBadRequest,
-				response:    "URL не найден\n",
-				contentType: "text/plain; charset=utf-8",
+				response:    "URL не найден",
+				contentType: "text/plain; charset=UTF-8",
 			},
 		},
 	}
 
 	urls["YBrECO"] = "https://ya.ru"
 
+	e := echo.New()
+
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			request := httptest.NewRequest(http.MethodGet, "/"+test.payload, nil)
+			request := httptest.NewRequest(http.MethodGet, "/", nil)
 
 			w := httptest.NewRecorder()
-			GetHandler(w, request)
 
-			res := w.Result()
+			c := e.NewContext(request, w)
 
-			defer res.Body.Close()
-
-			resBody, _ := io.ReadAll(res.Body)
-
-			assert.Equal(t, test.want.code, res.StatusCode)
-
-			if res.StatusCode == http.StatusBadRequest {
-				assert.Equal(t, test.want.response, string(resBody))
-			} else {
-				assert.Equal(t, test.want.response, res.Header.Get("Location"))
+			if test.payload != "" {
+				c.SetPath("/:hash")
+				c.SetParamNames("hash")
+				c.SetParamValues(test.payload)
 			}
 
+			GetHandler(c)
+
+			assert.Equal(t, test.want.code, w.Code)
+
+			if w.Code == http.StatusBadRequest {
+				assert.Equal(t, test.want.response, w.Body.String())
+			} else {
+				assert.Equal(t, test.want.response, w.Header().Get("Location"))
+			}
 		})
 	}
-}
-
-func TestRootHandler(t *testing.T) {
-	request := httptest.NewRequest(http.MethodPut, "/", nil)
-
-	w := httptest.NewRecorder()
-	RootHandler(w, request)
-
-	res := w.Result()
-
-	defer res.Body.Close()
-
-	resBody, _ := io.ReadAll(res.Body)
-
-	assert.Equal(t, http.StatusBadRequest, res.StatusCode)
-
-	assert.Equal(t, "Метод не доступен\n", string(resBody))
-
-	assert.Equal(t, "text/plain; charset=utf-8", res.Header.Get("Content-type"))
 }

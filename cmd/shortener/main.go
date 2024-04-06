@@ -4,8 +4,8 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"strings"
 
+	"github.com/labstack/echo"
 	"github.com/sqids/sqids-go"
 )
 
@@ -29,71 +29,52 @@ func makeHash(byteURL []byte) (string, error) {
 }
 
 // Обработчик POST запросов
-func PostHandler(res http.ResponseWriter, req *http.Request) {
+func PostHandler(c echo.Context) error {
 	// Валидация на сontent-type
-	if req.Header.Get("Content-type") != "text/plain; charset=utf-8" {
-		http.Error(res, "Неверный Content-type", http.StatusBadRequest)
-		return
+	if c.Request().Header.Get("Content-type") != "text/plain; charset=UTF-8" {
+		return c.String(http.StatusBadRequest, "Неверный Content-type")
 	}
 
-	body, errBody := io.ReadAll(req.Body)
+	body, errBody := io.ReadAll(c.Request().Body)
 
 	if errBody != nil {
-		http.Error(res, errBody.Error(), http.StatusBadRequest)
-		return
+		return c.String(http.StatusBadRequest, errBody.Error())
 	}
 
 	// Валидация корректности URL
 	_, errURL := url.ParseRequestURI(string(body))
 
 	if errURL != nil {
-		http.Error(res, "Некорректный URL", http.StatusBadRequest)
-		return
+		return c.String(http.StatusBadRequest, "Некорректный URL")
 	}
 
 	hash, errHash := makeHash(body)
 	if errHash != nil {
-		http.Error(res, "Ошибка создания короткой ссылки", http.StatusBadRequest)
+		return c.String(http.StatusBadRequest, "Ошибка создания короткой ссылки")
 	}
 
 	urls[hash] = string(body)
 
-	res.WriteHeader(http.StatusCreated)
-
-	res.Write([]byte("http://localhost:8080/" + hash))
+	return c.String(http.StatusCreated, "http://localhost:8080/"+hash)
 }
 
 // Обработчик GET запросов
-func GetHandler(res http.ResponseWriter, req *http.Request) {
-	hash := strings.TrimPrefix(req.URL.Path, "/")
+func GetHandler(c echo.Context) error {
+	hash := c.Param("hash")
+
 	url, ok := urls[hash]
 	if ok {
-		http.Redirect(res, req, url, http.StatusTemporaryRedirect)
+		return c.Redirect(http.StatusTemporaryRedirect, url)
 	} else {
-		http.Error(res, "URL не найден", http.StatusBadRequest)
-	}
-}
-
-// Обработчик входящего запроса
-func RootHandler(res http.ResponseWriter, req *http.Request) {
-	switch method := req.Method; method {
-	case http.MethodPost:
-		PostHandler(res, req)
-	case http.MethodGet:
-		GetHandler(res, req)
-	default:
-		// В случае метода который не обрабатываем возвращаем ошибку
-		http.Error(res, "Метод не доступен", http.StatusBadRequest)
+		return c.String(http.StatusBadRequest, "URL не найден")
 	}
 }
 
 func main() {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/", RootHandler)
+	e := echo.New()
 
-	err := http.ListenAndServe(":8080", mux)
+	e.GET("/:hash", GetHandler)
+	e.POST("/", PostHandler)
 
-	if err != nil {
-		panic(err)
-	}
+	e.Logger.Fatal(e.Start(":8080"))
 }
