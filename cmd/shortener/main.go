@@ -51,7 +51,10 @@ func PostHandler(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	hash, _ := makeHash(body)
+	hash, errHash := makeHash(body)
+	if errHash != nil {
+		http.Error(res, "Ошибка создания короткой ссылки", http.StatusBadRequest)
+	}
 
 	urls[hash] = string(body)
 
