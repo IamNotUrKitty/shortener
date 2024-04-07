@@ -8,14 +8,14 @@ import (
 
 var (
 	Address     string = "localhost:8080"
-	BaseAddress string = "localhost:8080"
+	BaseAddress string = "http://localhost:8080"
 )
 
 func parseAddress(addressP *string) func(string) error {
 	return func(address string) error {
 		hp := strings.Split(address, ":")
 		if len(hp) != 2 {
-			return errors.New("Need address in a form host:port")
+			return errors.New("need address in a form host:port")
 		}
 
 		*addressP = address
