@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -59,7 +60,7 @@ func PostHandler(c echo.Context) error {
 
 	urls[hash] = string(body)
 
-	return c.String(http.StatusCreated, *config.BaseAddress+hash)
+	return c.String(http.StatusCreated, config.BaseAddress+"/"+hash)
 }
 
 // Обработчик GET запросов
@@ -81,5 +82,7 @@ func main() {
 	e.GET("/:hash", GetHandler)
 	e.POST("/", PostHandler)
 
-	e.Logger.Fatal(e.Start(*config.Address))
+	fmt.Println(config.Address)
+
+	e.Logger.Fatal(e.Start(config.Address))
 }
