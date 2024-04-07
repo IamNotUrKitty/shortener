@@ -1,10 +1,13 @@
 package main
 
 import (
+	"flag"
 	"io"
 	"net/http"
 	"net/url"
 	"strings"
+
+	"github.com/iamnoturkkitty/shortener/internal/config"
 
 	"github.com/labstack/echo"
 	"github.com/sqids/sqids-go"
@@ -56,7 +59,7 @@ func PostHandler(c echo.Context) error {
 
 	urls[hash] = string(body)
 
-	return c.String(http.StatusCreated, "http://localhost:8080/"+hash)
+	return c.String(http.StatusCreated, *config.BaseAddress+hash)
 }
 
 // Обработчик GET запросов
@@ -72,10 +75,11 @@ func GetHandler(c echo.Context) error {
 }
 
 func main() {
+	flag.Parse()
 	e := echo.New()
 
 	e.GET("/:hash", GetHandler)
 	e.POST("/", PostHandler)
 
-	e.Logger.Fatal(e.Start(":8080"))
+	e.Logger.Fatal(e.Start(*config.Address))
 }
