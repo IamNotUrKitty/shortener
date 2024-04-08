@@ -1,4 +1,4 @@
-package main
+package app
 
 import (
 	"net/http"
@@ -88,7 +88,7 @@ func TestPostHandler(t *testing.T) {
 
 			c := e.NewContext(request, w)
 
-			PostHandler(c)
+			postHandler(c)
 
 			assert.Equal(t, test.want.code, w.Code)
 
@@ -149,7 +149,7 @@ func TestGetHandler(t *testing.T) {
 				c.SetParamValues(test.payload)
 			}
 
-			GetHandler(c)
+			getHandler(c)
 
 			assert.Equal(t, test.want.code, w.Code)
 

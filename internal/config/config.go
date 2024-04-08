@@ -8,7 +8,9 @@ import (
 )
 
 var (
-	Address     string = "localhost:8080"
+	// Адрес запуска HTTP-сервера
+	Address string = "localhost:8080"
+	// Базовый адрес результирующего сокращённого URL
 	BaseAddress string = "http://localhost:8080"
 )
 
