@@ -1,7 +1,6 @@
 package app
 
 import (
-	"flag"
 	"io"
 	"net/http"
 	"net/url"
@@ -75,7 +74,6 @@ func getHandler(c echo.Context) error {
 }
 
 func Run() error {
-	flag.Parse()
 	e := echo.New()
 
 	e.GET("/:hash", getHandler)
