@@ -32,33 +32,35 @@ func makeHash(byteURL []byte) (string, error) {
 }
 
 // Обработчик POST запросов
-func postHandler(c echo.Context) error {
-	// Валидация на сontent-type
-	if strings.ToLower(c.Request().Header.Get("Content-type")) != "text/plain; charset=utf-8" {
-		return c.String(http.StatusBadRequest, "Неверный Content-type")
+func makePostHandler(baseAddress string) func(echo.Context) error {
+	return func(c echo.Context) error {
+		// Валидация на сontent-type
+		if strings.ToLower(c.Request().Header.Get("Content-type")) != "text/plain; charset=utf-8" {
+			return c.String(http.StatusBadRequest, "Неверный Content-type")
+		}
+
+		body, errBody := io.ReadAll(c.Request().Body)
+
+		if errBody != nil {
+			return c.String(http.StatusBadRequest, errBody.Error())
+		}
+
+		// Валидация корректности URL
+		_, errURL := url.ParseRequestURI(string(body))
+
+		if errURL != nil {
+			return c.String(http.StatusBadRequest, "Некорректный URL")
+		}
+
+		hash, errHash := makeHash(body)
+		if errHash != nil {
+			return c.String(http.StatusBadRequest, "Ошибка создания короткой ссылки")
+		}
+
+		urls[hash] = string(body)
+
+		return c.String(http.StatusCreated, baseAddress+"/"+hash)
 	}
-
-	body, errBody := io.ReadAll(c.Request().Body)
-
-	if errBody != nil {
-		return c.String(http.StatusBadRequest, errBody.Error())
-	}
-
-	// Валидация корректности URL
-	_, errURL := url.ParseRequestURI(string(body))
-
-	if errURL != nil {
-		return c.String(http.StatusBadRequest, "Некорректный URL")
-	}
-
-	hash, errHash := makeHash(body)
-	if errHash != nil {
-		return c.String(http.StatusBadRequest, "Ошибка создания короткой ссылки")
-	}
-
-	urls[hash] = string(body)
-
-	return c.String(http.StatusCreated, config.BaseAddress+"/"+hash)
 }
 
 // Обработчик GET запросов
@@ -74,12 +76,15 @@ func getHandler(c echo.Context) error {
 }
 
 func Run() error {
+
+	cfg := config.GetConfig()
+
 	e := echo.New()
 
 	e.GET("/:hash", getHandler)
-	e.POST("/", postHandler)
+	e.POST("/", makePostHandler(cfg.BaseAddress))
 
-	err := e.Start(config.Address)
+	err := e.Start(cfg.Address)
 
 	if err != nil {
 		return err

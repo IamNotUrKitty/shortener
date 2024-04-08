@@ -88,7 +88,7 @@ func TestPostHandler(t *testing.T) {
 
 			c := e.NewContext(request, w)
 
-			postHandler(c)
+			makePostHandler("http://localhost:8080")(c)
 
 			assert.Equal(t, test.want.code, w.Code)
 
