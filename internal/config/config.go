@@ -9,14 +9,14 @@ import (
 )
 
 func parseAddress(configField *string, defaultValue string) func(string) error {
-	return func(address string) error {
-		hp := strings.Split(address, ":")
+	return func(value string) error {
+		hp := strings.Split(value, ":")
 		if len(hp) != 2 {
 			return errors.New("need address in a form host:port")
 		}
 
 		if *configField == defaultValue {
-			*configField = address
+			*configField = value
 		}
 
 		return nil
@@ -24,14 +24,14 @@ func parseAddress(configField *string, defaultValue string) func(string) error {
 }
 
 func parseURL(configField *string, defaultValue string) func(string) error {
-	return func(address string) error {
-		_, errURL := url.ParseRequestURI(address)
+	return func(value string) error {
+		_, errURL := url.ParseRequestURI(value)
 		if errURL != nil {
 			return errors.New("need base address in a valid URL form")
 		}
 
 		if *configField == defaultValue {
-			*configField = address
+			*configField = value
 		}
 
 		return nil
