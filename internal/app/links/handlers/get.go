@@ -11,8 +11,8 @@ func (h *Handler) GetLink(c echo.Context) error {
 
 	link, err := h.repo.GetLink(hash)
 	if err != nil {
-		return c.Redirect(http.StatusTemporaryRedirect, link.Url())
-	} else {
 		return c.String(http.StatusBadRequest, "URL не найден")
+	} else {
+		return c.Redirect(http.StatusTemporaryRedirect, link.Url())
 	}
 }

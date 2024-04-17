@@ -40,14 +40,14 @@ type Link struct {
 }
 
 func NewLink(url string) (*Link, error) {
-	hash, err := makeHash([]byte(url))
-	if err != nil {
-		return nil, err
-	}
-
 	errURL := validateURL(url)
 	if errURL != nil {
 		return nil, errURL
+	}
+
+	hash, err := makeHash([]byte(url))
+	if err != nil {
+		return nil, err
 	}
 
 	return &Link{
