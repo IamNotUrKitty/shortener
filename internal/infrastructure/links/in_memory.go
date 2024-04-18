@@ -21,7 +21,7 @@ func (r *InMemoryRepo) SaveLink(l links.Link) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	r.links[l.Hash()] = l.Url()
+	r.links[l.Hash()] = l.URL()
 
 	return nil
 }
@@ -33,7 +33,7 @@ func (r *InMemoryRepo) GetLink(hash string) (*links.Link, error) {
 	l, ok := r.links[hash]
 
 	if !ok {
-		return nil, links.LinkNotFound
+		return nil, links.ErrLinkNotFound
 	}
 	link, err := links.NewLink(l)
 	if err != nil {

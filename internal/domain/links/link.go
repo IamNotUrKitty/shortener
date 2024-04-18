@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	LinkNotFound = errors.New("link not found")
+	ErrLinkNotFound = errors.New("link not found")
 )
 
 var s, _ = sqids.New()
@@ -28,7 +28,7 @@ func makeHash(byteURL []byte) (string, error) {
 func validateURL(urlString string) error {
 	_, err := url.ParseRequestURI(urlString)
 	if err != nil {
-		return errors.New("Bad url")
+		return errors.New("bad url")
 	}
 
 	return nil
@@ -60,6 +60,6 @@ func (l *Link) Hash() string {
 	return l.hash
 }
 
-func (l *Link) Url() string {
+func (l *Link) URL() string {
 	return l.url
 }

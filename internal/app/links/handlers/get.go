@@ -13,6 +13,6 @@ func (h *Handler) GetLink(c echo.Context) error {
 	if err != nil {
 		return c.String(http.StatusBadRequest, "URL не найден")
 	} else {
-		return c.Redirect(http.StatusTemporaryRedirect, link.Url())
+		return c.Redirect(http.StatusTemporaryRedirect, link.URL())
 	}
 }

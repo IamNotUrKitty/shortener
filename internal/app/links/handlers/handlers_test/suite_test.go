@@ -5,6 +5,7 @@ import (
 
 	"github.com/iamnoturkkitty/shortener/internal/app/links"
 	"github.com/iamnoturkkitty/shortener/internal/app/links/handlers"
+	"github.com/iamnoturkkitty/shortener/internal/config"
 	linksInfra "github.com/iamnoturkkitty/shortener/internal/infrastructure/links"
 	"github.com/labstack/echo"
 	"github.com/stretchr/testify/suite"
@@ -19,7 +20,8 @@ type LinksSuite struct {
 func (s *LinksSuite) SetupSuite() {
 	s.e = echo.New()
 	s.repo = linksInfra.NewInMemoryRepo()
-	links.Setup(s.e, s.repo)
+	// TODO: Убрать хардкод конфига, подумать как получать конфиг для тестов
+	links.Setup(s.e, s.repo, &config.Config{Address: "localhost:8080", BaseAddress: "http://localhost:8080"})
 }
 
 func TestLinksSuite(t *testing.T) {

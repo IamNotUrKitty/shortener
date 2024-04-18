@@ -7,12 +7,12 @@ import (
 	"github.com/labstack/echo"
 )
 
-func NewServer(cfg config.Config) *echo.Echo {
+func NewServer(cfg *config.Config) *echo.Echo {
 	e := echo.New()
 
 	linksRepo := linksInfra.NewInMemoryRepo()
 
-	links.Setup(e, linksRepo)
+	links.Setup(e, linksRepo, cfg)
 
 	return e
 }

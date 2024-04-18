@@ -1,6 +1,9 @@
 package handlers
 
-import "github.com/iamnoturkkitty/shortener/internal/domain/links"
+import (
+	"github.com/iamnoturkkitty/shortener/internal/config"
+	"github.com/iamnoturkkitty/shortener/internal/domain/links"
+)
 
 type Repository interface {
 	SaveLink(l links.Link) error
@@ -8,11 +11,13 @@ type Repository interface {
 }
 
 type Handler struct {
-	repo Repository
+	repo        Repository
+	baseAddress string
 }
 
-func NewHandler(repo Repository) *Handler {
+func NewHandler(repo Repository, cfg *config.Config) *Handler {
 	return &Handler{
-		repo: repo,
+		repo:        repo,
+		baseAddress: cfg.BaseAddress,
 	}
 }

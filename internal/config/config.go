@@ -53,9 +53,9 @@ type Config struct {
 	BaseAddress string
 }
 
-func GetConfig() Config {
+func GetConfig() *Config {
 	var cfg Config
-	defaultAddress := "localhost:8080"
+	defaultAddress := "localhost:8090"
 	defaultBaseAddress := "http://localhost:8080"
 
 	flag.Func("a", "Адрес запуска HTTP-сервера", parseAddress(&cfg.Address, defaultAddress))
@@ -66,5 +66,5 @@ func GetConfig() Config {
 
 	flag.Parse()
 
-	return cfg
+	return &cfg
 }
