@@ -7,7 +7,7 @@ import (
 	"github.com/iamnoturkkitty/shortener/internal/app/links/handlers"
 	"github.com/iamnoturkkitty/shortener/internal/config"
 	linksInfra "github.com/iamnoturkkitty/shortener/internal/infrastructure/links"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/suite"
 )
 
