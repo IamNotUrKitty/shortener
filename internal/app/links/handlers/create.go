@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/iamnoturkkitty/shortener/internal/domain/links"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 )
 
 func (h *Handler) CreateLink(c echo.Context) error {

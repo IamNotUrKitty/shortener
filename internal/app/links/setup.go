@@ -3,7 +3,7 @@ package links
 import (
 	"github.com/iamnoturkkitty/shortener/internal/app/links/handlers"
 	"github.com/iamnoturkkitty/shortener/internal/config"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 )
 
 func Setup(e *echo.Echo, repo handlers.Repository, cfg *config.Config) {
