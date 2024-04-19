@@ -14,6 +14,7 @@ func NewServer(cfg *config.Config) *echo.Echo {
 
 	logger, _ := zap.NewDevelopment()
 
+	//TODO: move logger init to some utils
 	e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
 		LogStatus:       true,
 		LogURI:          true,

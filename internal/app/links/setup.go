@@ -11,4 +11,5 @@ func Setup(e *echo.Echo, repo handlers.Repository, cfg *config.Config) {
 
 	e.GET("/:hash", handler.GetLink)
 	e.POST("/", handler.CreateLink)
+	e.POST("/api/shorten", handler.CreateLinkJSON)
 }
