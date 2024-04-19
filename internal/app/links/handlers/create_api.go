@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"encoding/json"
+	"io"
 	"net/http"
 
 	"github.com/iamnoturkkitty/shortener/internal/domain/links"
@@ -8,7 +10,7 @@ import (
 )
 
 type RequestDTO struct {
-	Url string `json:"url"`
+	URL string `json:"url"`
 }
 
 type ResponseDTO struct {
@@ -18,11 +20,17 @@ type ResponseDTO struct {
 func (h *Handler) CreateLinkJSON(c echo.Context) error {
 	var data RequestDTO
 
-	if err := c.Bind(&data); err != nil {
-		return err
+	body, errBody := io.ReadAll(c.Request().Body)
+
+	if errBody != nil {
+		return c.String(http.StatusBadRequest, errBody.Error())
 	}
 
-	l, err := links.NewLink(data.Url)
+	if err := json.Unmarshal(body, &data); err != nil {
+		return c.String(http.StatusBadRequest, "Ошибка создания короткой ссылки")
+	}
+
+	l, err := links.NewLink(data.URL)
 
 	if err != nil {
 		// TODO: Убрать сравнение со стрингой

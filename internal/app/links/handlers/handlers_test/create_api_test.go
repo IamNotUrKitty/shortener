@@ -11,7 +11,7 @@ import (
 )
 
 func (s *LinksSuite) TestCreateApiLink() {
-	payload := handlers.RequestDTO{Url: "https://ya.ru"}
+	payload := handlers.RequestDTO{URL: "https://ya.ru"}
 
 	reqBody, _ := json.Marshal(payload)
 
