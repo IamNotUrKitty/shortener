@@ -11,7 +11,7 @@ import (
 
 func (h *Handler) CreateLink(c echo.Context) error {
 	// Валидация на сontent-type
-	if strings.ToLower(c.Request().Header.Get(echo.HeaderContentType)) != echo.MIMETextPlainCharsetUTF8 {
+	if strings.ToLower(c.Request().Header.Get(echo.HeaderContentType)) != "text/plain; charset=utf-8" {
 		return c.String(http.StatusBadRequest, "Неверный Content-type")
 	}
 
