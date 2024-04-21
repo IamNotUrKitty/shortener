@@ -37,6 +37,13 @@ func NewServer(cfg *config.Config) *echo.Echo {
 		},
 	}))
 
+	e.Use(middleware.GzipWithConfig(middleware.GzipConfig{
+		Skipper: func(c echo.Context) bool {
+			h := c.Request().Header.Get(echo.HeaderContentType)
+			return h != echo.MIMEApplicationJSON && h != echo.MIMETextHTML
+		},
+	}))
+
 	linksRepo := linksInfra.NewInMemoryRepo()
 
 	links.Setup(e, linksRepo, cfg)
