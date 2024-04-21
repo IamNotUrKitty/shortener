@@ -21,12 +21,14 @@ func NewServer(cfg *config.Config) *echo.Echo {
 		LogResponseSize: true,
 		LogMethod:       true,
 		LogLatency:      true,
+		LogHeaders:      []string{echo.HeaderContentType},
 
 		LogValuesFunc: func(c echo.Context, v middleware.RequestLoggerValues) error {
 			logger.Info("request",
 				zap.String("URI", v.URI),
 				zap.String("Method", v.Method),
 				zap.Duration("Latency", v.Latency),
+				zap.String("Content-type", v.Headers[echo.HeaderContentType][0]),
 			)
 
 			logger.Info("response",
