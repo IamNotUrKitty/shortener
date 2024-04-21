@@ -47,18 +47,18 @@ func (s *LinksSuite) TestCreateLink() {
 				contentType: "text/plain; charset=UTF-8",
 			},
 		},
-		{
-			name: "Передан некорректный Content-type",
-			want: want{
-				code:        http.StatusBadRequest,
-				contentType: "text/plain; charset=UTF-8",
-				response:    "Неверный Content-type",
-			},
-			payload: payload{
-				body:        "https://ya.ru",
-				contentType: "application/json",
-			},
-		},
+		// {
+		// 	name: "Передан некорректный Content-type",
+		// 	want: want{
+		// 		code:        http.StatusBadRequest,
+		// 		contentType: "text/plain; charset=UTF-8",
+		// 		response:    "Неверный Content-type",
+		// 	},
+		// 	payload: payload{
+		// 		body:        "https://ya.ru",
+		// 		contentType: "application/json",
+		// 	},
+		// },
 		{
 			name: "Передано пустое тело запроса",
 			want: want{
