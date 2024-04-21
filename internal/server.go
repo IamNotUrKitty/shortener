@@ -1,6 +1,8 @@
 package internal
 
 import (
+	"strings"
+
 	"github.com/iamnoturkkitty/shortener/internal/app/links"
 	"github.com/iamnoturkkitty/shortener/internal/config"
 	linksInfra "github.com/iamnoturkkitty/shortener/internal/infrastructure/links"
@@ -28,7 +30,7 @@ func NewServer(cfg *config.Config) *echo.Echo {
 				zap.String("URI", v.URI),
 				zap.String("Method", v.Method),
 				zap.Duration("Latency", v.Latency),
-				zap.String("Content-type", v.Headers[echo.HeaderContentType][0]),
+				zap.String("Content-type", strings.Join(v.Headers[echo.HeaderContentType], " ")),
 			)
 
 			logger.Info("response",
