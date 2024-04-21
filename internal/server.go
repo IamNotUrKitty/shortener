@@ -48,6 +48,8 @@ func NewServer(cfg *config.Config) *echo.Echo {
 		},
 	}))
 
+	e.Use(middleware.Decompress())
+
 	linksRepo := linksInfra.NewInMemoryRepo()
 
 	links.Setup(e, linksRepo, cfg)
