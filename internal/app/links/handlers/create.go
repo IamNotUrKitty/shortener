@@ -4,7 +4,6 @@ import (
 	"compress/gzip"
 	"io"
 	"net/http"
-	"strings"
 
 	"github.com/iamnoturkkitty/shortener/internal/domain/links"
 	"github.com/labstack/echo/v4"
@@ -30,14 +29,13 @@ func GetBody(c echo.Context) ([]byte, error) {
 	}
 
 	return body, nil
-
 }
 
 func (h *Handler) CreateLink(c echo.Context) error {
 	// Валидация на сontent-type
-	if strings.ToLower(c.Request().Header.Get(echo.HeaderContentType)) != "text/plain; charset=utf-8" {
-		return c.String(http.StatusBadRequest, "Неверный Content-type")
-	}
+	// if strings.ToLower(c.Request().Header.Get(echo.HeaderContentType)) != "text/plain; charset=utf-8" {
+	// 	return c.String(http.StatusBadRequest, "Неверный Content-type")
+	// }
 
 	body, errBody := GetBody(c)
 
