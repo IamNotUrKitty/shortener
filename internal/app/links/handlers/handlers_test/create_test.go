@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"strings"
+
+	"github.com/iamnoturkkitty/shortener/internal/domain/links"
 )
 
 func (s *LinksSuite) TestCreateLink() {
@@ -40,31 +42,19 @@ func (s *LinksSuite) TestCreateLink() {
 			want: want{
 				code:        http.StatusBadRequest,
 				contentType: "text/plain; charset=UTF-8",
-				response:    "Некорректный URL",
+				response:    links.ErrBadURL.Error(),
 			},
 			payload: payload{
 				body:        "123",
 				contentType: "text/plain; charset=UTF-8",
 			},
 		},
-		// {
-		// 	name: "Передан некорректный Content-type",
-		// 	want: want{
-		// 		code:        http.StatusBadRequest,
-		// 		contentType: "text/plain; charset=UTF-8",
-		// 		response:    "Неверный Content-type",
-		// 	},
-		// 	payload: payload{
-		// 		body:        "https://ya.ru",
-		// 		contentType: "application/json",
-		// 	},
-		// },
 		{
 			name: "Передано пустое тело запроса",
 			want: want{
 				code:        http.StatusBadRequest,
 				contentType: "text/plain; charset=UTF-8",
-				response:    "Некорректный URL",
+				response:    links.ErrBadURL.Error(),
 			},
 			payload: payload{
 				body:        "",

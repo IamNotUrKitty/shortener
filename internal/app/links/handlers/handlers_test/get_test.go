@@ -39,7 +39,7 @@ func (s *LinksSuite) TestGetLink() {
 			payload: "123",
 			want: want{
 				code:        http.StatusBadRequest,
-				response:    "URL не найден",
+				response:    links.ErrLinkNotFound.Error(),
 				contentType: "text/plain; charset=UTF-8",
 			},
 		},
