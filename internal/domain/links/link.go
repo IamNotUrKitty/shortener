@@ -8,7 +8,9 @@ import (
 )
 
 var (
-	ErrLinkNotFound = errors.New("link not found")
+	ErrLinkNotFound = errors.New("URL не найден")
+	ErrBadURL       = errors.New("Некорректный URL")
+	ErrLinkCreation = errors.New("Ошибка создания короткой ссылки")
 )
 
 var s, _ = sqids.New()
@@ -28,7 +30,7 @@ func makeHash(byteURL []byte) (string, error) {
 func validateURL(urlString string) error {
 	_, err := url.ParseRequestURI(urlString)
 	if err != nil {
-		return errors.New("bad url")
+		return ErrBadURL
 	}
 
 	return nil
@@ -47,7 +49,7 @@ func NewLink(url string) (*Link, error) {
 
 	hash, err := makeHash([]byte(url))
 	if err != nil {
-		return nil, err
+		return nil, ErrLinkCreation
 	}
 
 	return &Link{

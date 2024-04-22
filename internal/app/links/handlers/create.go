@@ -18,14 +18,12 @@ func (h *Handler) CreateLink(c echo.Context) error {
 	l, err := links.NewLink(string(body))
 
 	if err != nil {
-		// TODO: Убрать сравнение со стрингой
-		if err.Error() == "bad url" {
-			return c.String(http.StatusBadRequest, "Некорректный URL")
-		}
-		return c.String(http.StatusBadRequest, "Ошибка создания короткой ссылки")
+		return c.String(http.StatusBadRequest, err.Error())
 	}
 
-	h.repo.SaveLink(*l)
+	if err := h.repo.SaveLink(*l); err != nil {
+		return c.String(http.StatusBadRequest, links.ErrLinkCreation.Error())
+	}
 
 	return c.String(http.StatusCreated, h.baseAddress+"/"+l.Hash())
 }
