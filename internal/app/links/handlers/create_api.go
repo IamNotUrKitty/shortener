@@ -30,7 +30,7 @@ func (h *Handler) CreateLinkJSON(c echo.Context) error {
 		return c.String(http.StatusBadRequest, links.ErrLinkCreation.Error())
 	}
 
-	l, err := links.NewLink(data.URL)
+	l, err := links.CreateLink(data.URL)
 
 	if err != nil {
 		return c.String(http.StatusBadRequest, err.Error())

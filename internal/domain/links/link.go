@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/url"
 
+	"github.com/google/uuid"
 	"github.com/sqids/sqids-go"
 )
 
@@ -36,26 +37,38 @@ func validateURL(urlString string) error {
 	return nil
 }
 
+type StoredLink struct {
+	Hash string    `json:"short_url"`
+	URL  string    `json:"original_url"`
+	ID   uuid.UUID `json:"uuid"`
+}
+
 type Link struct {
 	hash string
 	url  string
+	id   uuid.UUID
 }
 
-func NewLink(url string) (*Link, error) {
+func NewLink(id uuid.UUID, url, hash string) (*Link, error) {
 	errURL := validateURL(url)
 	if errURL != nil {
 		return nil, errURL
 	}
 
+	return &Link{
+		id:   id,
+		hash: hash,
+		url:  url,
+	}, nil
+}
+
+func CreateLink(url string) (*Link, error) {
 	hash, err := makeHash([]byte(url))
 	if err != nil {
 		return nil, ErrLinkCreation
 	}
 
-	return &Link{
-		hash: hash,
-		url:  url,
-	}, nil
+	return NewLink(uuid.New(), url, hash)
 }
 
 func (l *Link) Hash() string {
@@ -64,4 +77,8 @@ func (l *Link) Hash() string {
 
 func (l *Link) URL() string {
 	return l.url
+}
+
+func (l *Link) ID() uuid.UUID {
+	return l.id
 }

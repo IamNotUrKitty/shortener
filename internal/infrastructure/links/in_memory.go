@@ -1,27 +1,29 @@
 package links
 
 import (
+	"fmt"
 	"sync"
 
 	"github.com/iamnoturkkitty/shortener/internal/domain/links"
 )
 
 type InMemoryRepo struct {
-	links map[string]string
+	links map[string]links.Link
 	mu    sync.RWMutex
 }
 
 func NewInMemoryRepo() *InMemoryRepo {
 	return &InMemoryRepo{
-		links: make(map[string]string),
+		links: make(map[string]links.Link),
 	}
 }
 
 func (r *InMemoryRepo) SaveLink(l links.Link) error {
-	r.mu.Lock()
-	defer r.mu.Unlock()
+	// r.mu.Lock()
+	// defer r.mu.Unlock()
 
-	r.links[l.Hash()] = l.URL()
+	// r.links[l.Hash()] = l
+	fmt.Println("123")
 
 	return nil
 }
@@ -35,7 +37,7 @@ func (r *InMemoryRepo) GetLink(hash string) (*links.Link, error) {
 	if !ok {
 		return nil, links.ErrLinkNotFound
 	}
-	link, err := links.NewLink(l)
+	link, err := links.NewLink(l.ID(), l.URL(), l.Hash())
 	if err != nil {
 		return nil, err
 	}

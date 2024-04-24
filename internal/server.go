@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/iamnoturkkitty/shortener/internal/app/links"
@@ -11,7 +12,7 @@ import (
 	"go.uber.org/zap"
 )
 
-func NewServer(cfg *config.Config) *echo.Echo {
+func NewServer(cfg *config.Config) (*echo.Echo, error) {
 	e := echo.New()
 
 	logger, _ := zap.NewDevelopment()
@@ -50,9 +51,14 @@ func NewServer(cfg *config.Config) *echo.Echo {
 
 	e.Use(middleware.Decompress())
 
-	linksRepo := linksInfra.NewInMemoryRepo()
+	fmt.Println(cfg.StorageFile)
+	linksRepo, err := linksInfra.NewInFSRepo("test.json")
+	if err != nil {
+		return nil, err
+	}
+	// linksRepo := linksInfra.NewInMemoryRepo()
 
 	links.Setup(e, linksRepo, cfg)
 
-	return e
+	return e, nil
 }

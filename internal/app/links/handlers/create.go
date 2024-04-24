@@ -15,7 +15,7 @@ func (h *Handler) CreateLink(c echo.Context) error {
 		return c.String(http.StatusBadRequest, errBody.Error())
 	}
 
-	l, err := links.NewLink(string(body))
+	l, err := links.CreateLink(string(body))
 
 	if err != nil {
 		return c.String(http.StatusBadRequest, err.Error())
