@@ -38,6 +38,16 @@ func parseURL(configField *string, defaultValue string) func(string) error {
 	}
 }
 
+func parseStorageFile(configField *string, defaultValue string) func(string) error {
+	return func(value string) error {
+		if *configField == defaultValue {
+			*configField = value
+		}
+
+		return nil
+	}
+}
+
 func getEnv(key, fallback string) string {
 	if value, exists := os.LookupEnv(key); exists {
 		return strings.ToLower(value)
@@ -58,10 +68,11 @@ func GetConfig() *Config {
 	var cfg Config
 	defaultAddress := "localhost:8080"
 	defaultBaseAddress := "http://localhost:8080"
+	defaultStorageFile := ""
 
 	flag.Func("a", "Адрес запуска HTTP-сервера", parseAddress(&cfg.Address, defaultAddress))
 	flag.Func("b", "Базовый адрес результирующего сокращённого URL", parseURL(&cfg.BaseAddress, defaultBaseAddress))
-	cfg.StorageFile = *flag.String("f", "test.json", "Адрес запуска HTTP-сервера")
+	flag.Func("d", "Базовый адрес результирующего сокращённого URL", parseStorageFile(&cfg.StorageFile, defaultStorageFile))
 
 	cfg.Address = getEnv("SERVER_ADDRESS", defaultAddress)
 	cfg.BaseAddress = getEnv("BASE_URL", defaultBaseAddress)
