@@ -50,7 +50,7 @@ func parseStorageFile(configField *string, defaultValue string) func(string) err
 
 func getEnv(key, fallback string) string {
 	if value, exists := os.LookupEnv(key); exists {
-		return strings.ToLower(value)
+		return value
 	}
 
 	return fallback
