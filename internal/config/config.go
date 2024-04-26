@@ -72,7 +72,7 @@ func GetConfig() *Config {
 
 	flag.Func("a", "Адрес запуска HTTP-сервера", parseAddress(&cfg.Address, defaultAddress))
 	flag.Func("b", "Базовый адрес результирующего сокращённого URL", parseURL(&cfg.BaseAddress, defaultBaseAddress))
-	flag.Func("d", "Базовый адрес результирующего сокращённого URL", parseStorageFile(&cfg.StorageFile, defaultStorageFile))
+	flag.Func("f", "Базовый адрес результирующего сокращённого URL", parseStorageFile(&cfg.StorageFile, defaultStorageFile))
 
 	cfg.Address = getEnv("SERVER_ADDRESS", defaultAddress)
 	cfg.BaseAddress = getEnv("BASE_URL", defaultBaseAddress)
