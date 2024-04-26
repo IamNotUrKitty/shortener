@@ -2,7 +2,6 @@ package links
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"os"
 
@@ -33,7 +32,6 @@ func readLink(decoder *json.Decoder) (*links.StoredLink, error) {
 }
 
 func NewInFSRepo(fileName string) (*InFSRepo, error) {
-	fmt.Println(fileName)
 	file, err := os.OpenFile(fileName, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
 		return nil, err
@@ -46,8 +44,6 @@ func NewInFSRepo(fileName string) (*InFSRepo, error) {
 		if err == io.EOF {
 			break
 		}
-
-		fmt.Println(e)
 
 		l, err := links.NewLink(e.ID, e.URL, e.Hash)
 		if err != nil {
@@ -65,7 +61,6 @@ func NewInFSRepo(fileName string) (*InFSRepo, error) {
 }
 
 func (r *InFSRepo) WriteLink(l links.Link) error {
-	fmt.Println(l)
 	return r.encoder.Encode(links.StoredLink{ID: l.ID(), URL: l.URL(), Hash: l.Hash()})
 }
 
@@ -78,6 +73,5 @@ func (r *InFSRepo) SaveLink(l links.Link) error {
 }
 
 func (r *InFSRepo) GetLink(hash string) (*links.Link, error) {
-
 	return r.memory.GetLink(hash)
 }

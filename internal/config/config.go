@@ -76,6 +76,7 @@ func GetConfig() *Config {
 
 	cfg.Address = getEnv("SERVER_ADDRESS", defaultAddress)
 	cfg.BaseAddress = getEnv("BASE_URL", defaultBaseAddress)
+	cfg.StorageFile = getEnv("FILE_STORAGE_PATH", defaultStorageFile)
 
 	flag.Parse()
 
