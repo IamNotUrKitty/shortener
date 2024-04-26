@@ -50,12 +50,10 @@ func NewServer(cfg *config.Config) (*echo.Echo, error) {
 
 	e.Use(middleware.Decompress())
 
-	linksRepo, err := linksInfra.NewInFSRepo(cfg.StorageFile)
-
+	linksRepo, err := linksInfra.InitFSRepo(cfg.StorageFile)
 	if err != nil {
 		return nil, err
 	}
-	// linksRepo := linksInfra.NewInMemoryRepo()
 
 	links.Setup(e, linksRepo, cfg)
 

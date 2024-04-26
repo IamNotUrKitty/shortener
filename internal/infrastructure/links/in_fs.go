@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 
+	"github.com/iamnoturkkitty/shortener/internal/app/links/handlers"
 	"github.com/iamnoturkkitty/shortener/internal/domain/links"
 )
 
@@ -12,6 +13,13 @@ type InFSRepo struct {
 	memory  *InMemoryRepo
 	file    *os.File
 	encoder *json.Encoder
+}
+
+func InitFSRepo(fileName string) (handlers.Repository, error) {
+	if fileName == "" {
+		return NewInMemoryRepo(), nil
+	}
+	return NewInFSRepo(fileName)
 }
 
 func readLink(decoder *json.Decoder) (*links.StoredLink, error) {
