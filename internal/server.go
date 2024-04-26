@@ -1,7 +1,6 @@
 package internal
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/iamnoturkkitty/shortener/internal/app/links"
@@ -51,8 +50,8 @@ func NewServer(cfg *config.Config) (*echo.Echo, error) {
 
 	e.Use(middleware.Decompress())
 
-	fmt.Println(cfg.StorageFile)
 	linksRepo, err := linksInfra.NewInFSRepo("test.json")
+
 	if err != nil {
 		return nil, err
 	}

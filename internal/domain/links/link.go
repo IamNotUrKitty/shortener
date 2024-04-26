@@ -50,11 +50,6 @@ type Link struct {
 }
 
 func NewLink(id uuid.UUID, url, hash string) (*Link, error) {
-	errURL := validateURL(url)
-	if errURL != nil {
-		return nil, errURL
-	}
-
 	return &Link{
 		id:   id,
 		hash: hash,
@@ -63,6 +58,11 @@ func NewLink(id uuid.UUID, url, hash string) (*Link, error) {
 }
 
 func CreateLink(url string) (*Link, error) {
+	errURL := validateURL(url)
+	if errURL != nil {
+		return nil, errURL
+	}
+
 	hash, err := makeHash([]byte(url))
 	if err != nil {
 		return nil, ErrLinkCreation
