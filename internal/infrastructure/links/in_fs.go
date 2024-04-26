@@ -38,6 +38,9 @@ func NewInFSRepo(fileName string) (*InFSRepo, error) {
 		}
 
 		l, err := links.NewLink(e.ID, e.URL, e.Hash)
+		if err != nil {
+			return nil, err
+		}
 
 		memRep.SaveLink(*l)
 	}

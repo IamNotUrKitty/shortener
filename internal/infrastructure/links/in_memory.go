@@ -1,7 +1,6 @@
 package links
 
 import (
-	"fmt"
 	"sync"
 
 	"github.com/iamnoturkkitty/shortener/internal/domain/links"
@@ -19,11 +18,10 @@ func NewInMemoryRepo() *InMemoryRepo {
 }
 
 func (r *InMemoryRepo) SaveLink(l links.Link) error {
-	// r.mu.Lock()
-	// defer r.mu.Unlock()
+	r.mu.Lock()
+	defer r.mu.Unlock()
 
-	// r.links[l.Hash()] = l
-	fmt.Println("123")
+	r.links[l.Hash()] = l
 
 	return nil
 }
