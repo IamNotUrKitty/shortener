@@ -32,7 +32,7 @@ func readLink(decoder *json.Decoder) (*links.StoredLink, error) {
 }
 
 func NewInFSRepo(fileName string) (*InFSRepo, error) {
-	file, err := os.OpenFile(fileName, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	file, err := os.OpenFile(fileName, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
 		return nil, err
 	}
