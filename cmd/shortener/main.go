@@ -1,11 +1,11 @@
 package main
 
 import (
-	"github.com/iamnoturkkitty/shortener/internal/app"
+	"github.com/iamnoturkkitty/shortener/internal"
 )
 
 func main() {
-	if err := app.Run(); err != nil {
+	if err := internal.Run(); err != nil {
 		panic(err)
 	}
 }
