@@ -31,14 +31,8 @@ func readLink(decoder *json.Decoder) (*links.StoredLink, error) {
 	return l, nil
 }
 
-func NewInFSRepo(fileName string) (*InFSRepo, error) {
-	file, err := os.OpenFile(fileName, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
-	if err != nil {
-		return nil, err
-	}
-	memRep := NewInMemoryRepo()
+func loadLinksFromFS(mr *InMemoryRepo, file *os.File) error {
 	decoder := json.NewDecoder(file)
-
 	for {
 		e, err := readLink(decoder)
 		if err == io.EOF {
@@ -47,10 +41,26 @@ func NewInFSRepo(fileName string) (*InFSRepo, error) {
 
 		l, err := links.NewLink(e.ID, e.URL, e.Hash)
 		if err != nil {
-			return nil, err
+			return err
 		}
 
-		memRep.SaveLink(*l)
+		if err := mr.SaveLink(*l); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func NewInFSRepo(fileName string) (*InFSRepo, error) {
+	file, err := os.OpenFile(fileName, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
+	if err != nil {
+		return nil, err
+	}
+	memRep := NewInMemoryRepo()
+
+	if err := loadLinksFromFS(memRep, file); err != nil {
+		return nil, err
 	}
 
 	return &InFSRepo{
@@ -65,9 +75,13 @@ func (r *InFSRepo) WriteLink(l links.Link) error {
 }
 
 func (r *InFSRepo) SaveLink(l links.Link) error {
-	r.memory.SaveLink(l)
+	if err := r.memory.SaveLink(l); err != nil {
+		return err
+	}
 
-	r.WriteLink(l)
+	if err := r.WriteLink(l); err != nil {
+		return err
+	}
 
 	return nil
 }
