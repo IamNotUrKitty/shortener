@@ -12,9 +12,7 @@ func Run() error {
 		return err
 	}
 
-	err = server.Start(config.Address)
-
-	if err != nil {
+	if err := server.Start(config.Address); err != nil {
 		return err
 	}
 

@@ -58,9 +58,8 @@ func NewLink(id uuid.UUID, url, hash string) (*Link, error) {
 }
 
 func CreateLink(url string) (*Link, error) {
-	errURL := validateURL(url)
-	if errURL != nil {
-		return nil, errURL
+	if err := validateURL(url); err != nil {
+		return nil, err
 	}
 
 	hash, err := makeHash([]byte(url))

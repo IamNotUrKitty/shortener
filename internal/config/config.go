@@ -61,6 +61,7 @@ type Config struct {
 	Address string
 	// Базовый адрес результирующего сокращённого URL
 	BaseAddress string
+	//Путь до файла хранения ссылок
 	StorageFile string
 }
 
@@ -68,11 +69,11 @@ func GetConfig() *Config {
 	var cfg Config
 	defaultAddress := "localhost:8080"
 	defaultBaseAddress := "http://localhost:8080"
-	defaultStorageFile := ""
+	defaultStorageFile := "/tmp/short-url-db.json"
 
 	flag.Func("a", "Адрес запуска HTTP-сервера", parseAddress(&cfg.Address, defaultAddress))
 	flag.Func("b", "Базовый адрес результирующего сокращённого URL", parseURL(&cfg.BaseAddress, defaultBaseAddress))
-	flag.Func("f", "Базовый адрес результирующего сокращённого URL", parseStorageFile(&cfg.StorageFile, defaultStorageFile))
+	flag.Func("f", "Путь до файла хранения ссылок", parseStorageFile(&cfg.StorageFile, defaultStorageFile))
 
 	cfg.Address = getEnv("SERVER_ADDRESS", defaultAddress)
 	cfg.BaseAddress = getEnv("BASE_URL", defaultBaseAddress)
