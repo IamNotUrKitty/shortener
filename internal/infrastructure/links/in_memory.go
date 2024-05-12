@@ -42,3 +42,7 @@ func (r *InMemoryRepo) GetLink(hash string) (*links.Link, error) {
 
 	return link, nil
 }
+
+func (r *InMemoryRepo) Test() error {
+	return nil
+}

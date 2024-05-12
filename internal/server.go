@@ -1,6 +1,8 @@
 package internal
 
 import (
+	"net/http"
+
 	"github.com/iamnoturkkitty/shortener/internal/app/links"
 	"github.com/iamnoturkkitty/shortener/internal/config"
 	echomiddleware "github.com/iamnoturkkitty/shortener/internal/echomiddleware"
@@ -25,12 +27,19 @@ func NewServer(cfg *config.Config) (*echo.Echo, error) {
 
 	e.Use(middleware.Decompress())
 
-	linksRepo, err := linksInfra.InitFSRepo(cfg.StorageFile)
+	linksRepo, err := linksInfra.Setup(cfg)
 	if err != nil {
 		return nil, err
 	}
 
 	links.Setup(e, linksRepo, cfg)
+
+	e.GET("/ping", func(c echo.Context) error {
+		if err := linksRepo.Test(); err != nil {
+			return c.String(http.StatusInternalServerError, err.Error())
+		}
+		return c.String(http.StatusOK, "ok")
+	})
 
 	return e, nil
 }

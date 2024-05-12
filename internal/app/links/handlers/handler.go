@@ -8,6 +8,7 @@ import (
 type Repository interface {
 	SaveLink(l links.Link) error
 	GetLink(hash string) (*links.Link, error)
+	Test() error
 }
 
 type Handler struct {

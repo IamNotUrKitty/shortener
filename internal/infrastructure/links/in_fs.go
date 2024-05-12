@@ -89,3 +89,7 @@ func (r *InFSRepo) SaveLink(l links.Link) error {
 func (r *InFSRepo) GetLink(hash string) (*links.Link, error) {
 	return r.memory.GetLink(hash)
 }
+
+func (r *InFSRepo) Test() error {
+	return nil
+}
