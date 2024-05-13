@@ -11,11 +11,11 @@ import (
 
 type RequestBatchDTO struct {
 	URL           string `json:"original_url"`
-	CorrelationId string `json:"correlation_id"`
+	CorrelationID string `json:"correlation_id"`
 }
 
 type ResponseBatchDTO struct {
-	CorrelationId string `json:"correlation_id"`
+	CorrelationID string `json:"correlation_id"`
 	ShortURL      string `json:"short_url"`
 }
 
@@ -42,7 +42,7 @@ func (h *Handler) CreateLinkBatch(c echo.Context) error {
 
 		linkArr = append(linkArr, *l)
 
-		response = append(response, ResponseBatchDTO{CorrelationId: i.CorrelationId, ShortURL: h.baseAddress + "/" + l.Hash()})
+		response = append(response, ResponseBatchDTO{CorrelationID: i.CorrelationID, ShortURL: h.baseAddress + "/" + l.Hash()})
 	}
 
 	if err := h.repo.SaveLinkBatch(linkArr); err != nil {
