@@ -41,8 +41,40 @@ func (r *PostgresRepo) SaveLink(l links.Link) error {
 	return nil
 }
 
+func (r *PostgresRepo) SaveLinkBatch(ls []links.Link) error {
+	tx, err := r.db.Begin()
+	if err != nil {
+		return err
+	}
+
+	defer tx.Rollback()
+
+	smtp, err := tx.PrepareContext(context.Background(), "INSERT INTO links  (short_url, original_url) VALUES ($1, $2);")
+	if err != nil {
+		return err
+	}
+
+	defer smtp.Close()
+
+	for _, l := range ls {
+		_, err := smtp.ExecContext(context.Background(), l.Hash(), l.URL())
+		if err != nil {
+			return err
+		}
+	}
+
+	return tx.Commit()
+}
+
 func (r *PostgresRepo) GetLink(hash string) (*links.Link, error) {
-	row := r.db.QueryRowContext(context.Background(), "SELECT id, short_url, original_url FROM links WHERE short_url=$1", hash)
+	smtp, err := r.db.PrepareContext(context.Background(), "SELECT id, short_url, original_url FROM links WHERE short_url=$1")
+	if err != nil {
+		return nil, err
+	}
+
+	defer smtp.Close()
+
+	row := smtp.QueryRowContext(context.Background(), hash)
 
 	var l links.StoredLink
 

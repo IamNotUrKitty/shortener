@@ -5,7 +5,6 @@ import (
 	"io"
 	"os"
 
-	"github.com/iamnoturkkitty/shortener/internal/app/links/handlers"
 	"github.com/iamnoturkkitty/shortener/internal/domain/links"
 )
 
@@ -13,13 +12,6 @@ type InFSRepo struct {
 	memory  *InMemoryRepo
 	file    *os.File
 	encoder *json.Encoder
-}
-
-func InitFSRepo(fileName string) (handlers.Repository, error) {
-	if fileName == "" {
-		return NewInMemoryRepo(), nil
-	}
-	return NewInFSRepo(fileName)
 }
 
 func readLink(decoder *json.Decoder) (*links.StoredLink, error) {
@@ -72,6 +64,14 @@ func NewInFSRepo(fileName string) (*InFSRepo, error) {
 
 func (r *InFSRepo) WriteLink(l links.Link) error {
 	return r.encoder.Encode(links.StoredLink{ID: l.ID(), URL: l.URL(), Hash: l.Hash()})
+}
+
+func (r *InFSRepo) SaveLinkBatch(ls []links.Link) error {
+	for _, l := range ls {
+		r.SaveLink(l)
+	}
+
+	return nil
 }
 
 func (r *InFSRepo) SaveLink(l links.Link) error {

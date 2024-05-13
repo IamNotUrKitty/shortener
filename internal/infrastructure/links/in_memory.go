@@ -26,6 +26,14 @@ func (r *InMemoryRepo) SaveLink(l links.Link) error {
 	return nil
 }
 
+func (r *InMemoryRepo) SaveLinkBatch(ls []links.Link) error {
+	for _, l := range ls {
+		r.SaveLink(l)
+	}
+
+	return nil
+}
+
 func (r *InMemoryRepo) GetLink(hash string) (*links.Link, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
