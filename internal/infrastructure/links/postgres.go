@@ -21,7 +21,7 @@ func NewPostgresRepo(cs string) (*PostgresRepo, error) {
 
 	if _, err := db.ExecContext(context.Background(), `CREATE TABLE IF NOT EXISTS links (
 			"id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-			"short_url" VARCHAR(250) NOT NULL DEFAULT '',
+			"short_url" VARCHAR(250) NOT NULL UNIQUE,
 			"created" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 			"original_url" TEXT)`); err != nil {
 		return nil, err
@@ -33,9 +33,18 @@ func NewPostgresRepo(cs string) (*PostgresRepo, error) {
 }
 
 func (r *PostgresRepo) SaveLink(l links.Link) error {
-	_, err := r.db.ExecContext(context.Background(), "INSERT INTO links  (short_url, original_url) VALUES ($1, $2);", l.Hash(), l.URL())
+	rs, err := r.db.ExecContext(context.Background(), "INSERT INTO links  (short_url, original_url) VALUES ($1, $2) ON CONFLICT DO NOTHING", l.Hash(), l.URL())
 	if err != nil {
 		return err
+	}
+
+	ra, err := rs.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if ra == 0 {
+		return links.ErrLinkDuplicate
 	}
 
 	return nil

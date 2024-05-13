@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"io"
 	"net/http"
 
@@ -22,6 +23,9 @@ func (h *Handler) CreateLink(c echo.Context) error {
 	}
 
 	if err := h.repo.SaveLink(*l); err != nil {
+		if errors.Is(err, links.ErrLinkDuplicate) {
+			return c.String(http.StatusConflict, h.baseAddress+"/"+l.Hash())
+		}
 		return c.String(http.StatusBadRequest, links.ErrLinkCreation.Error())
 	}
 

@@ -82,8 +82,8 @@ func GetConfig() *Config {
 	defaultAddress := "localhost:8080"
 	defaultBaseAddress := "http://localhost:8080"
 	defaultStorageFile := "/tmp/short-url-db.json"
-	// defaultDatabase := "postgres://postgres:postgres@localhost:5432/links?sslmode=disable"
-	defaultDatabase := ""
+	defaultDatabase := "postgres://postgres:postgres@localhost:5432/links?sslmode=disable"
+	// defaultDatabase := ""
 
 	flag.Func("a", "Адрес запуска HTTP-сервера", parseAddress(&cfg.Address, defaultAddress))
 	flag.Func("b", "Базовый адрес результирующего сокращённого URL", parseURL(&cfg.BaseAddress, defaultBaseAddress))

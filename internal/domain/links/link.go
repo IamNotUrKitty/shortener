@@ -9,9 +9,10 @@ import (
 )
 
 var (
-	ErrLinkNotFound = errors.New("не найден URL")
-	ErrBadURL       = errors.New("некорректный URL")
-	ErrLinkCreation = errors.New("ошибка создания короткой ссылки")
+	ErrLinkNotFound  = errors.New("не найден URL")
+	ErrBadURL        = errors.New("некорректный URL")
+	ErrLinkCreation  = errors.New("ошибка создания короткой ссылки")
+	ErrLinkDuplicate = errors.New("короткая ссылка уже была создана")
 )
 
 var s, _ = sqids.New()
