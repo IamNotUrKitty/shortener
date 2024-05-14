@@ -37,7 +37,7 @@ func (h *Handler) CreateLinkJSON(c echo.Context) error {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
 
-	if err := h.repo.SaveLink(*l); err != nil {
+	if err := h.repo.SaveLink(c.Request().Context(), *l); err != nil {
 		if errors.Is(err, links.ErrLinkDuplicate) {
 			return c.JSON(http.StatusConflict, ResponseDTO{Result: h.baseAddress + "/" + l.Hash()})
 		}

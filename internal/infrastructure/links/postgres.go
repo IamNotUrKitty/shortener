@@ -2,24 +2,23 @@ package links
 
 import (
 	"context"
-	"database/sql"
 	"time"
 
 	"github.com/iamnoturkkitty/shortener/internal/domain/links"
-	_ "github.com/jackc/pgx/v5/stdlib"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type PostgresRepo struct {
-	db *sql.DB
+	db *pgxpool.Pool
 }
 
 func NewPostgresRepo(cs string) (*PostgresRepo, error) {
-	db, err := sql.Open("pgx", cs)
+	pool, err := pgxpool.New(context.Background(), cs)
 	if err != nil {
 		return nil, err
 	}
 
-	if _, err := db.ExecContext(context.Background(), `CREATE TABLE IF NOT EXISTS links (
+	if _, err := pool.Exec(context.Background(), `CREATE TABLE IF NOT EXISTS links (
 			"id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
 			"short_url" VARCHAR(250) NOT NULL UNIQUE,
 			"created" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -28,20 +27,17 @@ func NewPostgresRepo(cs string) (*PostgresRepo, error) {
 	}
 
 	return &PostgresRepo{
-		db: db,
+		db: pool,
 	}, nil
 }
 
-func (r *PostgresRepo) SaveLink(l links.Link) error {
-	rs, err := r.db.ExecContext(context.Background(), "INSERT INTO links  (short_url, original_url) VALUES ($1, $2) ON CONFLICT DO NOTHING", l.Hash(), l.URL())
+func (r *PostgresRepo) SaveLink(ctx context.Context, l links.Link) error {
+	rs, err := r.db.Exec(ctx, "INSERT INTO links  (short_url, original_url) VALUES ($1, $2) ON CONFLICT DO NOTHING", l.Hash(), l.URL())
 	if err != nil {
 		return err
 	}
 
-	ra, err := rs.RowsAffected()
-	if err != nil {
-		return err
-	}
+	ra := rs.RowsAffected()
 
 	if ra == 0 {
 		return links.ErrLinkDuplicate
@@ -50,40 +46,26 @@ func (r *PostgresRepo) SaveLink(l links.Link) error {
 	return nil
 }
 
-func (r *PostgresRepo) SaveLinkBatch(ls []links.Link) error {
-	tx, err := r.db.Begin()
+func (r *PostgresRepo) SaveLinkBatch(ctx context.Context, ls []links.Link) error {
+	tx, err := r.db.Begin(ctx)
 	if err != nil {
 		return err
 	}
 
-	defer tx.Rollback()
-
-	smtp, err := tx.PrepareContext(context.Background(), "INSERT INTO links  (short_url, original_url) VALUES ($1, $2);")
-	if err != nil {
-		return err
-	}
-
-	defer smtp.Close()
+	defer tx.Rollback(ctx)
 
 	for _, l := range ls {
-		_, err := smtp.ExecContext(context.Background(), l.Hash(), l.URL())
+		_, err := r.db.Exec(context.Background(), "INSERT INTO links  (short_url, original_url) VALUES ($1, $2);", l.Hash(), l.URL())
 		if err != nil {
 			return err
 		}
 	}
 
-	return tx.Commit()
+	return tx.Commit(ctx)
 }
 
-func (r *PostgresRepo) GetLink(hash string) (*links.Link, error) {
-	smtp, err := r.db.PrepareContext(context.Background(), "SELECT id, short_url, original_url FROM links WHERE short_url=$1")
-	if err != nil {
-		return nil, err
-	}
-
-	defer smtp.Close()
-
-	row := smtp.QueryRowContext(context.Background(), hash)
+func (r *PostgresRepo) GetLink(ctx context.Context, hash string) (*links.Link, error) {
+	row := r.db.QueryRow(ctx, "SELECT id, short_url, original_url FROM links WHERE short_url=$1", hash)
 
 	var l links.StoredLink
 
@@ -98,7 +80,7 @@ func (r *PostgresRepo) Test() error {
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
 
-	if err := r.db.PingContext(ctx); err != nil {
+	if err := r.db.Ping(ctx); err != nil {
 		return err
 	}
 

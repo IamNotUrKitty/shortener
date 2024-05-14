@@ -45,7 +45,7 @@ func (h *Handler) CreateLinkBatch(c echo.Context) error {
 		response = append(response, ResponseBatchDTO{CorrelationID: i.CorrelationID, ShortURL: h.baseAddress + "/" + l.Hash()})
 	}
 
-	if err := h.repo.SaveLinkBatch(linkArr); err != nil {
+	if err := h.repo.SaveLinkBatch(c.Request().Context(), linkArr); err != nil {
 		return c.String(http.StatusBadRequest, links.ErrLinkCreation.Error())
 	}
 

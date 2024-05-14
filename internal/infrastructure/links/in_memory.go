@@ -1,6 +1,7 @@
 package links
 
 import (
+	"context"
 	"sync"
 
 	"github.com/iamnoturkkitty/shortener/internal/domain/links"
@@ -17,7 +18,7 @@ func NewInMemoryRepo() *InMemoryRepo {
 	}
 }
 
-func (r *InMemoryRepo) SaveLink(l links.Link) error {
+func (r *InMemoryRepo) SaveLink(ctx context.Context, l links.Link) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -26,15 +27,15 @@ func (r *InMemoryRepo) SaveLink(l links.Link) error {
 	return nil
 }
 
-func (r *InMemoryRepo) SaveLinkBatch(ls []links.Link) error {
+func (r *InMemoryRepo) SaveLinkBatch(ctx context.Context, ls []links.Link) error {
 	for _, l := range ls {
-		r.SaveLink(l)
+		r.SaveLink(ctx, l)
 	}
 
 	return nil
 }
 
-func (r *InMemoryRepo) GetLink(hash string) (*links.Link, error) {
+func (r *InMemoryRepo) GetLink(ctx context.Context, hash string) (*links.Link, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 

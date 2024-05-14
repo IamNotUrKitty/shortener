@@ -1,6 +1,7 @@
 package handlers_test
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 
@@ -10,7 +11,7 @@ import (
 func (s *LinksSuite) TestGetLink() {
 	link, _ := links.CreateLink("https://ya.ru")
 
-	err := s.repo.SaveLink(*link)
+	err := s.repo.SaveLink(context.Background(), *link)
 
 	s.Require().NoError(err)
 

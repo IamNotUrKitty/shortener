@@ -1,6 +1,7 @@
 package links
 
 import (
+	"context"
 	"encoding/json"
 	"io"
 	"os"
@@ -36,7 +37,7 @@ func loadLinksFromFS(mr *InMemoryRepo, file *os.File) error {
 			return err
 		}
 
-		if err := mr.SaveLink(*l); err != nil {
+		if err := mr.SaveLink(context.Background(), *l); err != nil {
 			return err
 		}
 	}
@@ -62,32 +63,32 @@ func NewInFSRepo(fileName string) (*InFSRepo, error) {
 	}, nil
 }
 
-func (r *InFSRepo) WriteLink(l links.Link) error {
+func (r *InFSRepo) WriteLink(ctx context.Context, l links.Link) error {
 	return r.encoder.Encode(links.StoredLink{ID: l.ID(), URL: l.URL(), Hash: l.Hash()})
 }
 
-func (r *InFSRepo) SaveLinkBatch(ls []links.Link) error {
+func (r *InFSRepo) SaveLinkBatch(ctx context.Context, ls []links.Link) error {
 	for _, l := range ls {
-		r.SaveLink(l)
+		r.SaveLink(ctx, l)
 	}
 
 	return nil
 }
 
-func (r *InFSRepo) SaveLink(l links.Link) error {
-	if err := r.memory.SaveLink(l); err != nil {
+func (r *InFSRepo) SaveLink(ctx context.Context, l links.Link) error {
+	if err := r.memory.SaveLink(ctx, l); err != nil {
 		return err
 	}
 
-	if err := r.WriteLink(l); err != nil {
+	if err := r.WriteLink(ctx, l); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (r *InFSRepo) GetLink(hash string) (*links.Link, error) {
-	return r.memory.GetLink(hash)
+func (r *InFSRepo) GetLink(ctx context.Context, hash string) (*links.Link, error) {
+	return r.memory.GetLink(ctx, hash)
 }
 
 func (r *InFSRepo) Test() error {

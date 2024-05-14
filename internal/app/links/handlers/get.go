@@ -10,7 +10,7 @@ import (
 func (h *Handler) GetLink(c echo.Context) error {
 	hash := c.Param("hash")
 
-	link, err := h.repo.GetLink(hash)
+	link, err := h.repo.GetLink(c.Request().Context(), hash)
 	if err != nil {
 		return c.String(http.StatusBadRequest, links.ErrLinkNotFound.Error())
 	} else {
