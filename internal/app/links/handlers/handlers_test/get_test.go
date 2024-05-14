@@ -28,7 +28,7 @@ func (s *LinksSuite) TestGetLink() {
 	}{
 		{
 			name:    "Успешно получили ссылку",
-			payload: "YBrECO",
+			payload: "YzyUw7",
 			want: want{
 				code:        http.StatusTemporaryRedirect,
 				response:    "https://ya.ru",
