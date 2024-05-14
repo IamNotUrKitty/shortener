@@ -77,6 +77,7 @@ type Config struct {
 	DatabaseAddress string
 }
 
+// TODO: Тут переписать
 func GetConfig() *Config {
 	var cfg Config
 	defaultAddress := "localhost:8080"
