@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 
@@ -26,6 +27,8 @@ func (h *Handler) CreateLinkJSON(c echo.Context) error {
 	if errBody != nil {
 		return c.String(http.StatusBadRequest, errBody.Error())
 	}
+
+	fmt.Println(string(body))
 
 	if err := json.Unmarshal(body, &data); err != nil {
 		return c.String(http.StatusBadRequest, links.ErrLinkCreation.Error())
