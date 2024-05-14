@@ -26,7 +26,7 @@ func makeHash(byteURL []byte) (string, error) {
 
 	hash, err := s.Encode(d)
 
-	return hash[:6], err
+	return hash[len(hash)-6:], err
 }
 
 func validateURL(urlString string) error {
