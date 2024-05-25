@@ -29,7 +29,7 @@ func (s *LinksSuite) TestCreateLink() {
 			name: "Успешно cоздали короткую ссылку",
 			want: want{
 				code:        http.StatusCreated,
-				response:    "http://localhost:8080/YBrECO",
+				response:    "http://localhost:8080/YzyUw7",
 				contentType: "text/plain; charset=UTF-8",
 			},
 			payload: payload{
