@@ -12,12 +12,12 @@ import (
 )
 
 type CustomClaims struct {
-	Id int `json:"id"`
+	UserID int `json:"id"`
 	jwt.RegisteredClaims
 }
 
-const SECRET = "secret"
-const COOKIE_NAME = "user"
+const Secret = "secret"
+const CookieName = "user"
 
 func InitJWTMiddleware() echo.MiddlewareFunc {
 	return echojwt.WithConfig(echojwt.Config{
@@ -30,20 +30,21 @@ func InitJWTMiddleware() echo.MiddlewareFunc {
 
 			claims := user.Claims.(*CustomClaims)
 
-			c.Set("userId", claims.Id)
+			c.Set("userId", claims.UserID)
 
 		},
 		ErrorHandler: func(c echo.Context, err error) error {
 			userID := rand.Int()
+
 			token := jwt.NewWithClaims(jwt.SigningMethodHS256, CustomClaims{
 				RegisteredClaims: jwt.RegisteredClaims{
 					ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 3)),
 				},
-				Id: userID,
+				UserID: userID,
 			})
 
-			tokenString, err := token.SignedString([]byte(SECRET))
-			if err != nil {
+			tokenString, errT := token.SignedString([]byte(Secret))
+			if errT != nil {
 				return err
 			}
 
@@ -59,14 +60,14 @@ func InitJWTMiddleware() echo.MiddlewareFunc {
 			return nil
 		},
 		TokenLookup: "cookie:user",
-		SigningKey:  []byte(SECRET),
+		SigningKey:  []byte(Secret),
 	})
 }
 
 func GetUser(c echo.Context) (int, error) {
 	a := c.Get("userId").(int)
 	if a == 0 {
-		return 0, errors.New("Отсутствует userId")
+		return 0, errors.New("отсутствует userId")
 	}
 	return a, nil
 }

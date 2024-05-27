@@ -20,7 +20,6 @@ func NewPostgresRepo(cs string) (*PostgresRepo, error) {
 
 	if _, err := pool.Exec(context.Background(), `CREATE TABLE IF NOT EXISTS links (
 			"id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-			"user_id" BIGINT,
 			"short_url" VARCHAR(250) NOT NULL UNIQUE,
 			"user_id" BIGINT,
 			"created" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

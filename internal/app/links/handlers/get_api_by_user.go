@@ -9,14 +9,14 @@ import (
 )
 
 type ResponseByUserDTO struct {
-	OriginalUrl string `json:"original_url"`
+	OriginalURL string `json:"original_url"`
 	ShortURL    string `json:"short_url"`
 }
 
 func (h *Handler) GetLinksByUserID(c echo.Context) error {
 	var res = []ResponseByUserDTO{}
 
-	_, err := c.Cookie(echomiddleware.COOKIE_NAME)
+	_, err := c.Cookie(echomiddleware.CookieName)
 	if err != nil {
 		return c.String(http.StatusUnauthorized, "Unauthorized")
 	}
@@ -36,7 +36,7 @@ func (h *Handler) GetLinksByUserID(c echo.Context) error {
 		}
 
 		for _, l := range linkList {
-			res = append(res, ResponseByUserDTO{OriginalUrl: l.URL(), ShortURL: h.baseAddress + "/" + l.Hash()})
+			res = append(res, ResponseByUserDTO{OriginalURL: l.URL(), ShortURL: h.baseAddress + "/" + l.Hash()})
 		}
 
 		return c.JSON(http.StatusOK, res)

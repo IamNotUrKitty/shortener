@@ -52,11 +52,11 @@ func (r *InMemoryRepo) GetLink(ctx context.Context, hash string) (*links.Link, e
 	return link, nil
 }
 
-func (r *InMemoryRepo) GetLinkByUserID(ctx context.Context, userId int) ([]*links.Link, error) {
+func (r *InMemoryRepo) GetLinkByUserID(ctx context.Context, userID int) ([]*links.Link, error) {
 	res := []*links.Link{}
 
 	for _, k := range r.links {
-		if k.UserID() == userId {
+		if k.UserID() == userID {
 			res = append(res, &k)
 		}
 	}
