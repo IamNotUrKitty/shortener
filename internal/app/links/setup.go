@@ -10,7 +10,8 @@ func Setup(e *echo.Echo, repo handlers.Repository, cfg *config.Config) {
 	handler := handlers.NewHandler(repo, cfg)
 
 	e.GET("/:hash", handler.GetLink)
+	e.GET("/api/user/urls", handler.GetLinksByUserID)
 	e.POST("/", handler.CreateLink)
 	e.POST("/api/shorten", handler.CreateLinkJSON)
-	e.POST("api/shorten/batch", handler.CreateLinkBatch)
+	e.POST("/api/shorten/batch", handler.CreateLinkBatch)
 }

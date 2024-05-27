@@ -44,12 +44,24 @@ func (r *InMemoryRepo) GetLink(ctx context.Context, hash string) (*links.Link, e
 	if !ok {
 		return nil, links.ErrLinkNotFound
 	}
-	link, err := links.NewLink(l.ID(), l.URL(), l.Hash())
+	link, err := links.NewLink(l.ID(), l.URL(), l.Hash(), l.UserID())
 	if err != nil {
 		return nil, err
 	}
 
 	return link, nil
+}
+
+func (r *InMemoryRepo) GetLinkByUserID(ctx context.Context, userID int) ([]*links.Link, error) {
+	res := []*links.Link{}
+
+	for _, k := range r.links {
+		if k.UserID() == userID {
+			res = append(res, &k)
+		}
+	}
+
+	return res, nil
 }
 
 func (r *InMemoryRepo) Test() error {

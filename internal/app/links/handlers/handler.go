@@ -10,6 +10,7 @@ import (
 type Repository interface {
 	SaveLink(ctx context.Context, l links.Link) error
 	GetLink(ctx context.Context, hash string) (*links.Link, error)
+	GetLinkByUserID(ctx context.Context, userID int) ([]*links.Link, error)
 	SaveLinkBatch(ctx context.Context, l []links.Link) error
 	Test() error
 }

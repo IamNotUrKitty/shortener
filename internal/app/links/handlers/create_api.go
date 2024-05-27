@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/iamnoturkkitty/shortener/internal/domain/links"
+	"github.com/iamnoturkkitty/shortener/internal/echomiddleware"
 	"github.com/labstack/echo/v4"
 )
 
@@ -31,7 +32,12 @@ func (h *Handler) CreateLinkJSON(c echo.Context) error {
 		return c.String(http.StatusBadRequest, links.ErrLinkCreation.Error())
 	}
 
-	l, err := links.CreateLink(data.URL)
+	userID, err := echomiddleware.GetUser(c)
+	if err != nil {
+		return c.String(http.StatusBadRequest, err.Error())
+	}
+
+	l, err := links.CreateLink(data.URL, userID)
 	if err != nil {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
