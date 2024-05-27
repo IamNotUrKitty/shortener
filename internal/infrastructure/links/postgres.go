@@ -70,7 +70,7 @@ func (r *PostgresRepo) SaveLinkBatch(ctx context.Context, ls []links.Link) error
 }
 
 func (r *PostgresRepo) GetLink(ctx context.Context, hash string) (*links.Link, error) {
-	row := r.db.QueryRow(ctx, "SELECT id, short_url, original_url FROM links WHERE short_url=$1", hash)
+	row := r.db.QueryRow(ctx, "SELECT id, short_url, original_url, user_id FROM links WHERE short_url=$1", hash)
 
 	var l links.StoredLink
 
