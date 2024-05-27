@@ -9,7 +9,7 @@ import (
 )
 
 func (s *LinksSuite) TestGetLink() {
-	link, _ := links.CreateLink("https://ya.ru")
+	link, _ := links.CreateLink("https://ya.ru", 1)
 
 	err := s.repo.SaveLink(context.Background(), *link)
 

@@ -27,6 +27,8 @@ func NewServer(cfg *config.Config) (*echo.Echo, error) {
 
 	e.Use(middleware.Decompress())
 
+	e.Use(echomiddleware.InitJWTMiddleware())
+
 	linksRepo, err := linksInfra.Setup(cfg)
 	if err != nil {
 		return nil, err

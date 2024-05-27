@@ -32,7 +32,7 @@ func loadLinksFromFS(mr *InMemoryRepo, file *os.File) error {
 			break
 		}
 
-		l, err := links.NewLink(e.ID, e.URL, e.Hash)
+		l, err := links.NewLink(e.ID, e.URL, e.Hash, e.UserID)
 		if err != nil {
 			return err
 		}
@@ -89,6 +89,10 @@ func (r *InFSRepo) SaveLink(ctx context.Context, l links.Link) error {
 
 func (r *InFSRepo) GetLink(ctx context.Context, hash string) (*links.Link, error) {
 	return r.memory.GetLink(ctx, hash)
+}
+
+func (r *InFSRepo) GetLinkByUserID(ctx context.Context, userID int) ([]*links.Link, error) {
+	return r.memory.GetLinkByUserID(ctx, userID)
 }
 
 func (r *InFSRepo) Test() error {
