@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 
@@ -32,17 +33,20 @@ func (h *Handler) CreateLinkBatch(c echo.Context) error {
 	}
 
 	if err := json.Unmarshal(body, &data); err != nil {
+		fmt.Println(err)
 		return c.String(http.StatusBadRequest, links.ErrLinkCreation.Error())
 	}
 
 	userID, err := echomiddleware.GetUser(c)
 	if err != nil {
+		fmt.Println(err)
 		return c.String(http.StatusBadRequest, links.ErrLinkCreation.Error())
 	}
 
 	for _, i := range data {
 		l, err := links.CreateLink(i.URL, userID)
 		if err != nil {
+			fmt.Println(err)
 			return c.String(http.StatusBadRequest, links.ErrLinkCreation.Error())
 		}
 
@@ -52,6 +56,7 @@ func (h *Handler) CreateLinkBatch(c echo.Context) error {
 	}
 
 	if err := h.repo.SaveLinkBatch(c.Request().Context(), linkArr); err != nil {
+		fmt.Println(err)
 		return c.String(http.StatusBadRequest, links.ErrLinkCreation.Error())
 	}
 

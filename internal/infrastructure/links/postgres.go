@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/iamnoturkkitty/shortener/internal/domain/links"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -22,6 +23,7 @@ func NewPostgresRepo(cs string) (*PostgresRepo, error) {
 			"id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
 			"short_url" VARCHAR(250) NOT NULL UNIQUE,
 			"user_id" BIGINT,
+			"is_deleted" BOOL DEFAULT FALSE,
 			"created" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 			"original_url" TEXT)`); err != nil {
 		return nil, err
@@ -60,7 +62,7 @@ func (r *PostgresRepo) SaveLinkBatch(ctx context.Context, ls []links.Link) error
 
 	for _, l := range ls {
 		_, err := r.db.Exec(ctx,
-			"INSERT INTO links  (short_url, original_url, user_id) VALUES ($1, $2, $3);", l.Hash(), l.URL(), l.UserID())
+			"INSERT INTO links  (short_url, original_url, user_id) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING;", l.Hash(), l.URL(), l.UserID())
 		if err != nil {
 			return err
 		}
@@ -69,20 +71,32 @@ func (r *PostgresRepo) SaveLinkBatch(ctx context.Context, ls []links.Link) error
 	return tx.Commit(ctx)
 }
 
+func (r *PostgresRepo) DeleteLinkBatch(ctx context.Context, ls []string, userID int) error {
+	batch := &pgx.Batch{}
+
+	for _, l := range ls {
+		batch.Queue("UPDATE links SET is_deleted = true WHERE user_id = $1 AND short_url = $2", userID, l)
+	}
+
+	dbr := r.db.SendBatch(ctx, batch)
+
+	return dbr.Close()
+}
+
 func (r *PostgresRepo) GetLink(ctx context.Context, hash string) (*links.Link, error) {
-	row := r.db.QueryRow(ctx, "SELECT id, short_url, original_url, user_id FROM links WHERE short_url=$1", hash)
+	row := r.db.QueryRow(ctx, "SELECT id, short_url, original_url, user_id, is_deleted FROM links WHERE short_url=$1", hash)
 
 	var l links.StoredLink
 
-	if err := row.Scan(&l.ID, &l.Hash, &l.URL, &l.UserID); err != nil {
+	if err := row.Scan(&l.ID, &l.Hash, &l.URL, &l.UserID, &l.Deleted); err != nil {
 		return nil, err
 	}
 
-	return links.NewLink(l.ID, l.URL, l.Hash, l.UserID)
+	return links.NewLink(l.ID, l.URL, l.Hash, l.UserID, l.Deleted)
 }
 
 func (r *PostgresRepo) GetLinkByUserID(ctx context.Context, userID int) ([]*links.Link, error) {
-	rows, err := r.db.Query(ctx, "SELECT id, short_url, original_url, user_id FROM links WHERE user_id=$1", userID)
+	rows, err := r.db.Query(ctx, "SELECT id, short_url, original_url, user_id, is_deleted FROM links WHERE user_id=$1", userID)
 	if err != nil {
 		return nil, err
 	}
@@ -94,11 +108,11 @@ func (r *PostgresRepo) GetLinkByUserID(ctx context.Context, userID int) ([]*link
 	for rows.Next() {
 		var l links.StoredLink
 
-		if err := rows.Scan(&l.ID, &l.Hash, &l.URL, &l.UserID); err != nil {
+		if err := rows.Scan(&l.ID, &l.Hash, &l.URL, &l.UserID, &l.Deleted); err != nil {
 			return nil, err
 		}
 
-		ll, err := links.NewLink(l.ID, l.URL, l.Hash, l.UserID)
+		ll, err := links.NewLink(l.ID, l.URL, l.Hash, l.UserID, l.Deleted)
 		if err != nil {
 			return nil, err
 		}

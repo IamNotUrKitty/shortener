@@ -12,6 +12,7 @@ type Repository interface {
 	GetLink(ctx context.Context, hash string) (*links.Link, error)
 	GetLinkByUserID(ctx context.Context, userID int) ([]*links.Link, error)
 	SaveLinkBatch(ctx context.Context, l []links.Link) error
+	DeleteLinkBatch(ctx context.Context, l []string, userID int) error
 	Test() error
 }
 

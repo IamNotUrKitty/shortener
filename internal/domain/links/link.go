@@ -41,25 +41,28 @@ func validateURL(urlString string) error {
 }
 
 type StoredLink struct {
-	Hash   string    `json:"short_url"`
-	URL    string    `json:"original_url"`
-	UserID int       `json:"user_id"`
-	ID     uuid.UUID `json:"uuid"`
+	Hash    string    `json:"short_url"`
+	URL     string    `json:"original_url"`
+	UserID  int       `json:"user_id"`
+	ID      uuid.UUID `json:"uuid"`
+	Deleted bool      `json:"is_deleted"`
 }
 
 type Link struct {
-	hash   string
-	url    string
-	id     uuid.UUID
-	userID int
+	hash    string
+	url     string
+	id      uuid.UUID
+	userID  int
+	deleted bool
 }
 
-func NewLink(id uuid.UUID, url, hash string, userID int) (*Link, error) {
+func NewLink(id uuid.UUID, url, hash string, userID int, deleted bool) (*Link, error) {
 	return &Link{
-		id:     id,
-		hash:   hash,
-		url:    url,
-		userID: userID,
+		id:      id,
+		hash:    hash,
+		url:     url,
+		userID:  userID,
+		deleted: deleted,
 	}, nil
 }
 
@@ -73,7 +76,7 @@ func CreateLink(url string, userID int) (*Link, error) {
 		return nil, ErrLinkCreation
 	}
 
-	return NewLink(uuid.New(), url, hash, userID)
+	return NewLink(uuid.New(), url, hash, userID, false)
 }
 
 func (l *Link) Hash() string {
@@ -90,4 +93,14 @@ func (l *Link) ID() uuid.UUID {
 
 func (l *Link) UserID() int {
 	return l.userID
+}
+
+func (l *Link) Deleted() bool {
+	return l.deleted
+}
+
+func (l *Link) SetDeleted() bool {
+	l.deleted = true
+
+	return l.deleted
 }

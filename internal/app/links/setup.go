@@ -11,6 +11,7 @@ func Setup(e *echo.Echo, repo handlers.Repository, cfg *config.Config) {
 
 	e.GET("/:hash", handler.GetLink)
 	e.GET("/api/user/urls", handler.GetLinksByUserID)
+	e.DELETE("/api/user/urls", handler.DeleteLinkByUserID)
 	e.POST("/", handler.CreateLink)
 	e.POST("/api/shorten", handler.CreateLinkJSON)
 	e.POST("/api/shorten/batch", handler.CreateLinkBatch)

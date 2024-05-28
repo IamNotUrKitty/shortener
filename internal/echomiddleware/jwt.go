@@ -50,7 +50,7 @@ func InitJWTMiddleware() echo.MiddlewareFunc {
 			}
 
 			cookie := http.Cookie{
-				Name:    "user",
+				Name:    CookieName,
 				Value:   tokenString,
 				Expires: time.Now().Add(3 * time.Hour),
 			}

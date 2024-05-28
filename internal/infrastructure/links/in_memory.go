@@ -2,6 +2,7 @@ package links
 
 import (
 	"context"
+	"slices"
 	"sync"
 
 	"github.com/iamnoturkkitty/shortener/internal/domain/links"
@@ -44,7 +45,7 @@ func (r *InMemoryRepo) GetLink(ctx context.Context, hash string) (*links.Link, e
 	if !ok {
 		return nil, links.ErrLinkNotFound
 	}
-	link, err := links.NewLink(l.ID(), l.URL(), l.Hash(), l.UserID())
+	link, err := links.NewLink(l.ID(), l.URL(), l.Hash(), l.UserID(), l.Deleted())
 	if err != nil {
 		return nil, err
 	}
@@ -62,6 +63,16 @@ func (r *InMemoryRepo) GetLinkByUserID(ctx context.Context, userID int) ([]*link
 	}
 
 	return res, nil
+}
+
+func (r *InMemoryRepo) DeleteLinkBatch(ctx context.Context, l []string, userID int) error {
+	for _, k := range r.links {
+		if k.UserID() == userID && slices.Index(l, k.Hash()) > -1 {
+			k.SetDeleted()
+		}
+	}
+
+	return nil
 }
 
 func (r *InMemoryRepo) Test() error {
