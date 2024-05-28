@@ -14,6 +14,9 @@ func (h *Handler) GetLink(c echo.Context) error {
 	if err != nil {
 		return c.String(http.StatusBadRequest, links.ErrLinkNotFound.Error())
 	} else {
+		if link.Deleted() {
+			return c.String(http.StatusGone, "deleted")
+		}
 		return c.Redirect(http.StatusTemporaryRedirect, link.URL())
 	}
 }

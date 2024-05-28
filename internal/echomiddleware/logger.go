@@ -15,7 +15,7 @@ func InitLoggerMiddleware(l *zap.Logger) echo.MiddlewareFunc {
 		LogResponseSize: true,
 		LogMethod:       true,
 		LogLatency:      true,
-		LogHeaders:      []string{echo.HeaderContentType},
+		LogHeaders:      []string{echo.HeaderContentType, echo.HeaderCookie},
 
 		LogValuesFunc: func(c echo.Context, v middleware.RequestLoggerValues) error {
 			l.Info("request",
@@ -23,6 +23,7 @@ func InitLoggerMiddleware(l *zap.Logger) echo.MiddlewareFunc {
 				zap.String("Method", v.Method),
 				zap.Duration("Latency", v.Latency),
 				zap.String("Content-type", strings.Join(v.Headers[echo.HeaderContentType], " ")),
+				zap.String("Cookie", strings.Join(v.Headers[echo.HeaderCookie], " ")),
 			)
 
 			l.Info("response",
