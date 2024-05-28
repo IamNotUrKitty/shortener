@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 
@@ -9,6 +10,16 @@ import (
 	"github.com/iamnoturkkitty/shortener/internal/echomiddleware"
 	"github.com/labstack/echo/v4"
 )
+
+func deleteTaskGenerator(hashes []string, userID int, queue chan<- links.DeleteLinkTask) error {
+	go func() {
+		for _, val := range hashes {
+			queue <- links.DeleteLinkTask{Hash: val, UserID: userID}
+		}
+	}()
+
+	return nil
+}
 
 type RequestDeleteDTO []string
 
@@ -25,6 +36,8 @@ func (h *Handler) DeleteLinkByUserID(c echo.Context) error {
 		return c.String(http.StatusUnauthorized, "Unauthorized")
 	}
 
+	fmt.Println(userID)
+
 	body, errBody := io.ReadAll(c.Request().Body)
 	if errBody != nil {
 		return c.String(http.StatusBadRequest, errBody.Error())
@@ -34,7 +47,7 @@ func (h *Handler) DeleteLinkByUserID(c echo.Context) error {
 		return c.String(http.StatusBadRequest, links.ErrLinkCreation.Error())
 	}
 
-	h.repo.DeleteLinkBatch(c.Request().Context(), data, userID)
+	deleteTaskGenerator(data, userID, h.deleteQueue)
 
 	return c.JSON(http.StatusAccepted, data)
 

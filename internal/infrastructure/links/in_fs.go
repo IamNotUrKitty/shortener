@@ -95,8 +95,8 @@ func (r *InFSRepo) GetLinkByUserID(ctx context.Context, userID int) ([]*links.Li
 	return r.memory.GetLinkByUserID(ctx, userID)
 }
 
-func (r *InFSRepo) DeleteLinkBatch(ctx context.Context, l []string, userID int) error {
-	return r.memory.DeleteLinkBatch(ctx, l, userID)
+func (r *InFSRepo) DeleteLinkBatch(ctx context.Context, ls []links.DeleteLinkTask) error {
+	return r.memory.DeleteLinkBatch(ctx, ls)
 }
 
 func (r *InFSRepo) Test() error {

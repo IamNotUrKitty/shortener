@@ -2,7 +2,6 @@ package echomiddleware
 
 import (
 	"errors"
-	"fmt"
 	"math/rand"
 	"net/http"
 	"time"
@@ -56,11 +55,10 @@ func InitJWTMiddleware() echo.MiddlewareFunc {
 			}
 
 			c.SetCookie(&cookie)
-			fmt.Println(cookie)
 			c.Set("userId", userID)
 			return nil
 		},
-		TokenLookup: "cookie:user",
+		TokenLookup: "cookie:" + CookieName,
 		SigningKey:  []byte(Secret),
 	})
 }

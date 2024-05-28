@@ -56,6 +56,11 @@ type Link struct {
 	deleted bool
 }
 
+type DeleteLinkTask struct {
+	Hash   string
+	UserID int
+}
+
 func NewLink(id uuid.UUID, url, hash string, userID int, deleted bool) (*Link, error) {
 	return &Link{
 		id:      id,

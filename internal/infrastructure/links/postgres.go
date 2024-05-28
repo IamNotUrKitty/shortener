@@ -71,11 +71,11 @@ func (r *PostgresRepo) SaveLinkBatch(ctx context.Context, ls []links.Link) error
 	return tx.Commit(ctx)
 }
 
-func (r *PostgresRepo) DeleteLinkBatch(ctx context.Context, ls []string, userID int) error {
+func (r *PostgresRepo) DeleteLinkBatch(ctx context.Context, ls []links.DeleteLinkTask) error {
 	batch := &pgx.Batch{}
 
 	for _, l := range ls {
-		batch.Queue("UPDATE links SET is_deleted = true WHERE user_id = $1 AND short_url = $2", userID, l)
+		batch.Queue("UPDATE links SET is_deleted = true WHERE user_id = $1 AND short_url = $2", l.UserID, l.Hash)
 	}
 
 	dbr := r.db.SendBatch(ctx, batch)
