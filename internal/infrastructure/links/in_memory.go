@@ -69,6 +69,8 @@ func (r *InMemoryRepo) DeleteLinkBatch(ctx context.Context, ls []links.DeleteLin
 		l, ok := r.links[v.Hash]
 		if ok && v.UserID == l.UserID() {
 			l.SetDeleted()
+
+			r.links[l.Hash()] = l
 		}
 	}
 
